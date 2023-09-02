@@ -61,8 +61,7 @@ public class Transaction implements Serializable {
         this.recipientGets = amountSent - transactionFee;
     }
 
-    @NotNull(message = "The created at date can't be null")
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     @Temporal(TemporalType.DATE)
     private Date createdAt;
 
