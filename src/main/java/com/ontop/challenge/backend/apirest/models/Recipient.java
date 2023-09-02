@@ -1,12 +1,10 @@
 package com.ontop.challenge.backend.apirest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,7 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Entity
 @Data
@@ -29,10 +27,6 @@ public class Recipient implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 4051255552006179927L;
-
-    public Recipient() {
-        transactions = new ArrayList<>();
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,8 +70,8 @@ public class Recipient implements Serializable {
     @Column(nullable = false)
     private String bankName;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "recipient", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recipient")
     @JsonIgnoreProperties({"recipient", "hibernateLazyInitializer", "handler"})
-    private List<Transaction> transactions;
+    private List<Transaction> transactions = new ArrayList<>();
 
 }
