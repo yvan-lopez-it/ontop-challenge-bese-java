@@ -12,6 +12,7 @@ public class TransactionRequestDto implements Serializable {
     @Serial
     private static final long serialVersionUID = -1106677210328490066L;
 
+    private Long userId;
     private Long recipientId;
     private Double amount;
 }

@@ -1,4 +1,4 @@
-package com.ontop.challenge.backend.apirest.exceptions;
+package com.ontop.challenge.backend.apirest.exceptions.wallet;
 
 import java.io.Serial;
 
@@ -11,7 +11,4 @@ public class WalletInsufficientBalanceException extends RuntimeException {
         super(message);
     }
 
-    public WalletInsufficientBalanceException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

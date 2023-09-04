@@ -3,15 +3,12 @@ package com.ontop.challenge.backend.apirest.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
@@ -56,14 +53,6 @@ public class Recipient implements Serializable {
     @Column(nullable = false, unique = true)
     @Size(min = 10, message = "The size of the account number must be at least 9 characters long")
     private String accountNumber;
-
-    public enum AccountCurrency {
-        USD, EUR, PEN, COP
-    }
-
-    @NotNull(message = "The account currency can't be null")
-    @Enumerated(EnumType.STRING)
-    private AccountCurrency accountCurrency;
 
     @NotBlank(message = "The bank name can't be empty")
     @Size(min = 3, max = 20, message = "The size of the bank name must be between 3 and 20 characters long")

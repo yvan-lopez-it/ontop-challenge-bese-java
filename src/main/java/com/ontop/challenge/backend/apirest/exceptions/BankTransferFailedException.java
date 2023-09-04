@@ -11,7 +11,4 @@ public class BankTransferFailedException extends RuntimeException {
         super(message);
     }
 
-    public BankTransferFailedException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

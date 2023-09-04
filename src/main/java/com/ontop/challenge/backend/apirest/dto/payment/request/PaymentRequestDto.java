@@ -3,9 +3,11 @@ package com.ontop.challenge.backend.apirest.dto.payment.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class PaymentRequestDto implements Serializable {
 
     @Serial

@@ -2,7 +2,7 @@ package com.ontop.challenge.backend.apirest.controllers;
 
 import com.ontop.challenge.backend.apirest.dto.TransactionRequestDto;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
-import com.ontop.challenge.backend.apirest.exceptions.WalletInsufficientBalanceException;
+import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
 import com.ontop.challenge.backend.apirest.models.Transaction;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class TransactionRestController {
     @PostMapping("/perform")
     public ResponseEntity<?> performTransaction(@RequestBody TransactionRequestDto request) {
         try {
-            Transaction transaction = transactionService.performWalletToBankTransaction(request.getRecipientId(), request.getAmount());
+            Transaction transaction = transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(), request.getAmount());
             return ResponseEntity.ok(transaction);
         } catch (WalletInsufficientBalanceException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
