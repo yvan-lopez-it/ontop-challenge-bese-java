@@ -3,10 +3,14 @@ package com.ontop.challenge.backend.apirest.dto.wallet;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class WalletTransactionResponseDto implements Serializable {
 

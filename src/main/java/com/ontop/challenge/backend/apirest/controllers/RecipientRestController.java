@@ -25,11 +25,6 @@ public class RecipientRestController {
         this.recipientService = recipientService;
     }
 
-    @PostMapping
-    public ResponseEntity<Recipient> saveRecipient(@Validated @RequestBody Recipient recipient) {
-        Recipient savedRecipient = recipientService.saveRecipient(recipient);
-        return new ResponseEntity<>(savedRecipient, HttpStatus.CREATED);
-    }
 
     @GetMapping
     public ResponseEntity<List<Recipient>> getAllRecipients() {
@@ -46,5 +41,11 @@ public class RecipientRestController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping
+    public ResponseEntity<Recipient> saveRecipient(@Validated @RequestBody Recipient recipient) {
+        Recipient savedRecipient = recipientService.saveRecipient(recipient);
+        return new ResponseEntity<>(savedRecipient, HttpStatus.CREATED);
     }
 }

@@ -15,18 +15,21 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Data
-@Builder
 @Table(name = "transactions")
+@Data
+@NoArgsConstructor
 public class Transaction implements Serializable {
 
     @Serial
@@ -49,16 +52,13 @@ public class Transaction implements Serializable {
     private Double recipientGets;
 
     @Column(name = "created_at")
-    @Temporal(TemporalType.DATE)
-    private Date createdAt;
-
-    public Transaction() {
-
-    }
+    private String createdAt;
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = new Date();
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        this.createdAt = dateFormat.format(date);
     }
 
     // Define enum for transaction status

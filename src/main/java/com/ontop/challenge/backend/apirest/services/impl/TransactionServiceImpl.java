@@ -22,12 +22,17 @@ import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -148,6 +153,12 @@ public class TransactionServiceImpl implements ITransactionService {
         return savedTx;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Transaction> getTransactionsByRecipientId(Long recipientId, Pageable pageable) {
+        return transactionDao.findByRecipientIdOrderByCreatedAtDesc(recipientId, pageable);
+    }
+
     private WalletTransactionRequestDto buildWalletTransactionRequestDto(Long userId, Double amount, boolean isWithdraw) {
         if (isWithdraw) {
             amount *= -1;
@@ -160,6 +171,8 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     private void createWalletTransaction(WalletTransactionRequestDto walletTransactionRequestDto) {
+        System.out.println("walletTransactionRequestDto: ");
+        System.out.println(walletTransactionRequestDto);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -176,28 +189,28 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     private Double getBalance(Long userId) {
-        StringBuilder sbUrl = new StringBuilder();
-        sbUrl.append(walletBalanceUrl)
-            .append("?")
-            .append("user_id")
-            .append("=")
-            .append(userId);
+        String sbUrl = walletBalanceUrl
+            + "?"
+            + "user_id"
+            + "="
+            + userId;
 
-        ResponseEntity<BalanceResponseDto> response = restTemplate.getForEntity(sbUrl.toString(), BalanceResponseDto.class);
+        ResponseEntity<BalanceResponseDto> response = restTemplate.getForEntity(sbUrl, BalanceResponseDto.class);
         return Objects.requireNonNull(response.getBody()).getBalance();
     }
 
     private Transaction buildTransaction(Double amountSent, Double transactionFee, Double recipientGets, Recipient recipient,
         String message, Status transactionStatus) {
 
-        return Transaction.builder()
-            .transactionFee(transactionFee)
-            .amountSent(amountSent)
-            .recipientGets(recipientGets)
-            .status(transactionStatus)
-            .recipient(recipient)
-            .message(message)
-            .build();
+        Transaction transaction = new Transaction();
+        transaction.setTransactionFee(transactionFee);
+        transaction.setAmountSent(amountSent);
+        transaction.setRecipientGets(recipientGets);
+        transaction.setStatus(transactionStatus);
+        transaction.setRecipient(recipient);
+        transaction.setMessage(message);
+
+        return transaction;
     }
 
     private PaymentRequestDto buildPaymentRequestDto(Transaction tx) {
@@ -236,7 +249,7 @@ public class TransactionServiceImpl implements ITransactionService {
             .amount(tx.getAmountSent())
             .build();
 
-        //FIXME
+        //TODO: Logs
         System.out.println("paymentRequestDto: " + paymentRequestDto);
 
         return paymentRequestDto;
@@ -261,7 +274,6 @@ public class TransactionServiceImpl implements ITransactionService {
             PaymentResponseDto.class
         );
 
-        // Extract and return the response body
         responseEntity.getBody();
     }
 
