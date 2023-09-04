@@ -15,10 +15,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import lombok.ToString;
 
 
-@Entity
 @Data
+@ToString
+@Entity
 @Table(name = "recipients")
 public class Recipient implements Serializable {
 

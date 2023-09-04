@@ -20,12 +20,12 @@ import com.ontop.challenge.backend.apirest.repositories.IRecipientDao;
 import com.ontop.challenge.backend.apirest.repositories.ITransactionDao;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,6 +40,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class TransactionServiceImpl implements ITransactionService {
+
+    private final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     @Value("${wallet.balance.url}")
     private String walletBalanceUrl;
@@ -58,6 +60,21 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Value("${transaction.messages.refund}")
     private String txMsgRefund;
+
+    @Value("${ontop.source.info.name}")
+    private String sourceInfoName;
+
+    @Value("${ontop.account.number}")
+    private String companyAccountNUmber;
+
+    @Value("${currency.default}")
+    private String defaultCurrency;
+
+    @Value("${ontop.routing.number}")
+    private String companyRoutingNumber;
+
+    @Value("${ontop.source.type}")
+    private String companySourceType;
 
     private final IRecipientDao recipientDao;
     private final ITransactionDao transactionDao;
@@ -78,11 +95,13 @@ public class TransactionServiceImpl implements ITransactionService {
         // ------------------------------------------------------------------------------
 
         // Get the user balance
+        log.info("Perform get user balance call");
         Double userBalance = this.getBalance(userId);
+        log.info("User balance: " + userBalance);
 
         // Evaluate if the user has sufficient balance
         if (userBalance < amountSent) {
-            System.err.println("User balance is insufficient. userBalance=" + userBalance);
+            log.error("User balance is insufficient. userBalance=" + userBalance);
             throw new WalletInsufficientBalanceException("Insufficient balance amount.");
         }
 
@@ -91,29 +110,37 @@ public class TransactionServiceImpl implements ITransactionService {
         // ------------------------------------------------------------------------------
 
         //Get Recipient from db
+        log.info("Looking for recipientId: " + recipientId);
         Recipient recipient = this.getRecipient(recipientId);
 
         if (recipient == null) {
-            System.err.println("Recipient no found. recipientId=" + recipientId);
+            log.error("Recipient no found. recipientId=" + recipientId);
             throw new RecipientNotFoundException("Insufficient balance amount.");
         }
+
+        log.info("Recipient found");
 
         // ------------------------------------------------------------------------------
         // -------- Fee logic process --------
         // ------------------------------------------------------------------------------
+        log.info("Amount to be sent: " + amountSent);
         Double transactionFee = amountSent * feePercentageVal / 100.00;
+        log.info("10% transaction fee to apply: " + transactionFee);
         Double recipientGets = amountSent - transactionFee;
+        log.info("Recipient gets: " + recipientGets);
 
         // ------------------------------------------------------------------------------
         // -------- Update Wallet process --------
         // ------------------------------------------------------------------------------
         try {
+            log.info("Perform create wallet transaction call");
             WalletTransactionRequestDto walletTransactionRequestDto = this.buildWalletTransactionRequestDto(userId, recipientGets, true);
             this.createWalletTransaction(walletTransactionRequestDto);
         } catch (HttpClientErrorException.BadRequest | HttpClientErrorException.NotFound | HttpServerErrorException.InternalServerError ex) {
-            System.err.println(ex.getMessage());
+            log.error("Error when performing create wallet transaction call: " + ex.getMessage());
             throw new WalletrRequestException(ex.getMessage());
         }
+        log.info("Success in performing create wallet transaction call");
 
         // ------------------------------------------------------------------------------
         // -------- Transaction process --------
@@ -121,9 +148,11 @@ public class TransactionServiceImpl implements ITransactionService {
 
         Status transactionStatus = Status.IN_PROGRESS;
         //Set transaction
+        log.info("Build the transaction object");
         Transaction transaction = this.buildTransaction(amountSent, transactionFee, recipientGets, recipient, txMsgDefault, transactionStatus);
         // Save Transaction in db
-        Transaction savedTx = transactionDao.save(transaction);
+        Transaction savedTransaction = transactionDao.save(transaction);
+        log.info("Transaction crated and saved: transactionId=" + savedTransaction.getId());
 
         // ------------------------------------------------------------------------------
         // -------- Payment process --------
@@ -131,16 +160,20 @@ public class TransactionServiceImpl implements ITransactionService {
 
         try {
             // Build PaymentRequestDto
-            PaymentRequestDto paymentRequestDto = this.buildPaymentRequestDto(savedTx);
+            log.info("Build the PaymentRequestDto object.");
+            PaymentRequestDto paymentRequestDto = this.buildPaymentRequestDto(savedTransaction);
             // Send the payment request to 3rd. party.
+            log.info("Perform create payment in provider call");
             this.performPayment(paymentRequestDto);
         } catch (HttpClientErrorException.BadRequest | HttpServerErrorException.InternalServerError ex) {
-            System.err.println(ex.getMessage());
+            log.error("Error performing create payment in provider call: " + ex.getMessage());
 
+            log.info("Transaction with status FAILED");
             transaction.setStatus(Status.FAILED);
             transactionDao.save(transaction);
 
             //Proceed with refund
+            log.info("Proceed to refund");
             this.buildWalletTransactionRequestDto(userId, recipientGets, false);
             transaction.setStatus(Status.REFUNDED);
             transaction.setMessage(txMsgRefund);
@@ -150,7 +183,7 @@ public class TransactionServiceImpl implements ITransactionService {
 
         }
 
-        return savedTx;
+        return savedTransaction;
     }
 
     @Override
@@ -171,8 +204,6 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     private void createWalletTransaction(WalletTransactionRequestDto walletTransactionRequestDto) {
-        System.out.println("walletTransactionRequestDto: ");
-        System.out.println(walletTransactionRequestDto);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -215,26 +246,25 @@ public class TransactionServiceImpl implements ITransactionService {
 
     private PaymentRequestDto buildPaymentRequestDto(Transaction tx) {
 
-        //TODO: Company info in another place maybe in props
         SourceInformationDto sourceInformationDto = SourceInformationDto.builder()
-            .name("ONTOP INC")
+            .name(sourceInfoName)
             .build();
 
         AccountDto companyAccountDto = AccountDto.builder()
-            .accountNumber("0245253419")
-            .currency("USD")
-            .routingNumber("028444018")
+            .accountNumber(companyAccountNUmber)
+            .currency(defaultCurrency)
+            .routingNumber(companyRoutingNumber)
             .build();
 
         SourceDto sourceDto = SourceDto.builder()
-            .type("COMPANY")
+            .type(companySourceType)
             .sourceInformation(sourceInformationDto)
             .account(companyAccountDto)
             .build();
 
         AccountDto recipientAccountDto = AccountDto.builder()
             .accountNumber(tx.getRecipient().getAccountNumber())
-            .currency("USD") //For the sake of this demo, let's use USD currency
+            .currency(defaultCurrency)
             .routingNumber(tx.getRecipient().getRoutingNumber())
             .build();
 
@@ -249,9 +279,6 @@ public class TransactionServiceImpl implements ITransactionService {
             .amount(tx.getAmountSent())
             .build();
 
-        //TODO: Logs
-        System.out.println("paymentRequestDto: " + paymentRequestDto);
-
         return paymentRequestDto;
     }
 
@@ -260,10 +287,8 @@ public class TransactionServiceImpl implements ITransactionService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create the HTTP request entity with the DTO as the request body
         HttpEntity<PaymentRequestDto> requestEntity = new HttpEntity<>(paymentRequestDto, headers);
 
-        // Build the URI with parameters (if any)
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(paymentExternalApiUrl);
 
         // Send the POST request and retrieve the response

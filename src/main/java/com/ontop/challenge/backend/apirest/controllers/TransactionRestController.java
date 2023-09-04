@@ -36,17 +36,11 @@ public class TransactionRestController {
     public ResponseEntity<?> getTransactionsByRecipientId(
         @PathVariable Long recipientId,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "2") int size
-    ) {
-        // Create a Pageable object for pagination and sorting
+        @RequestParam(defaultValue = "2") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt"));
-
-        // Call your service method to retrieve transactions by recipientId using pageable
         Page<Transaction> transactions = transactionService.getTransactionsByRecipientId(recipientId, pageable);
 
-        // Return the transactions as a ResponseEntity
         return ResponseEntity.ok(transactions);
-
     }
 
     @PostMapping("/perform")
