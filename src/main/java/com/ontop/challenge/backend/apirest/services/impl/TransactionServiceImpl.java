@@ -124,7 +124,7 @@ public class TransactionServiceImpl implements ITransactionService {
         // -------- Fee logic process --------
         // ------------------------------------------------------------------------------
         log.info("Amount to be sent: " + amountSent);
-        Double transactionFee = amountSent * feePercentageVal / 100.00;
+        Double transactionFee = amountSent * Objects.requireNonNullElse(feePercentageVal, 0.10);
         log.info("10% transaction fee to apply: " + transactionFee);
         Double recipientGets = amountSent - transactionFee;
         log.info("Recipient gets: " + recipientGets);
@@ -300,6 +300,10 @@ public class TransactionServiceImpl implements ITransactionService {
         );
 
         responseEntity.getBody();
+    }
+
+    public void updateValue() {
+        System.out.println(companySourceType);
     }
 
 }
