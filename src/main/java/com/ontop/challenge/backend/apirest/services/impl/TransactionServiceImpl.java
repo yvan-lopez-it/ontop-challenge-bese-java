@@ -302,8 +302,4 @@ public class TransactionServiceImpl implements ITransactionService {
         responseEntity.getBody();
     }
 
-    public void updateValue() {
-        System.out.println(companySourceType);
-    }
-
 }

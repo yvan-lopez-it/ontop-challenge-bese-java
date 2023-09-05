@@ -16,6 +16,4 @@ public class BalanceResponseDto {
     @JsonProperty("user_id")
     private Long userId;
 
-    public BalanceResponseDto(Double balance) {
-    }
 }
