@@ -22,6 +22,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,6 +32,8 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "transactions")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Transaction implements Serializable {
 
     @Serial
@@ -66,14 +70,14 @@ public class Transaction implements Serializable {
         COMPLETED, REFUNDED, FAILED, IN_PROGRESS
     }
 
-    @NotNull(message = "The message can't be null")
-    @Column(nullable = false)
-    private String message;
-
     @NotNull(message = "The status can't be null")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @NotNull(message = "The message can't be null")
+    @Column(nullable = false)
+    private String message;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")

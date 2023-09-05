@@ -13,9 +13,11 @@ import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,15 +36,26 @@ public class TransactionRestControllerTest {
     @Mock
     private ITransactionService transactionService;
 
+    @Mock
+    private Transaction transactionA;
+
+    @Mock
+    private Transaction transactionB;
+
+    @Mock
+    private TransactionRequestDto transactionRequestDto;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
     @Test
     public void testGetTransactionsByRecipientId() {
         // Prepare test data
         Long recipientId = 1L;
         Pageable pageable = PageRequest.of(0, 2, Sort.by("createdAt"));
-        List<Transaction> transactions = Arrays.asList(
-            new Transaction(/* initialize with data */),
-            new Transaction(/* initialize with data */)
-        );
+        List<Transaction> transactions = Arrays.asList(transactionA, transactionB);
         Page<Transaction> page = new PageImpl<>(transactions);
 
         // Mock the service method
@@ -54,40 +67,38 @@ public class TransactionRestControllerTest {
         // Assert the response
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(response.getBody() instanceof Page);
-
-        // You can further assert the content of the page if needed
     }
 
     @Test
     public void testPerformTransaction() {
-        // Prepare test data
-        TransactionRequestDto request = new TransactionRequestDto(/* initialize with data */);
-        Transaction transaction = new Transaction(/* initialize with data */);
 
         // Mock the service method
-        when(transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(), request.getAmount())).thenReturn(transaction);
+        when(transactionService.performWalletToBankTransaction(
+            transactionRequestDto.getUserId(),
+            transactionRequestDto.getRecipientId(),
+            transactionRequestDto.getAmount())
+        ).thenReturn(transactionA);
 
         // Perform the POST request to the controller
-        ResponseEntity<?> response = transactionController.performTransaction(request);
+        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto);
 
         // Assert the response
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(response.getBody() instanceof Transaction);
-
-        // You can further assert the content of the transaction if needed
     }
 
     @Test
     public void testPerformTransaction_InsufficientBalanceException() {
-        // Prepare test data
-        TransactionRequestDto request = new TransactionRequestDto(/* initialize with data */);
 
         // Mock the service method to throw WalletInsufficientBalanceException
-        when(transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(), request.getAmount()))
-            .thenThrow(new WalletInsufficientBalanceException("Insufficient Balance"));
+        when(transactionService.performWalletToBankTransaction(
+            transactionRequestDto.getUserId(),
+            transactionRequestDto.getRecipientId(),
+            transactionRequestDto.getAmount())
+        ).thenThrow(new WalletInsufficientBalanceException("Insufficient Balance"));
 
         // Perform the POST request to the controller
-        ResponseEntity<?> response = transactionController.performTransaction(request);
+        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto);
 
         // Assert the response
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -96,15 +107,15 @@ public class TransactionRestControllerTest {
 
     @Test
     public void testPerformTransaction_BankTransferFailedException() {
-        // Prepare test data
-        TransactionRequestDto request = new TransactionRequestDto(/* initialize with data */);
-
         // Mock the service method to throw BankTransferFailedException
-        when(transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(), request.getAmount()))
-            .thenThrow(new BankTransferFailedException("Bank transfer failed"));
+        when(transactionService.performWalletToBankTransaction(
+            transactionRequestDto.getUserId(),
+            transactionRequestDto.getRecipientId(),
+            transactionRequestDto.getAmount())
+        ).thenThrow(new BankTransferFailedException("Bank transfer failed"));
 
         // Perform the POST request to the controller
-        ResponseEntity<?> response = transactionController.performTransaction(request);
+        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto);
 
         // Assert the response
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
