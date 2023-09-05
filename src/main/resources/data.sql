@@ -2,8 +2,6 @@
 insert into recipients (first_name, last_name, routing_number, national_id_number, account_number, bank_name)
 values ('Jemimah', 'MacShane', '326047655', '094375570', '2792399946', 'Ledner and Sons Bank');
 
--- insert into recipients (first_name, last_name, routing_number, national_id_number, account_number, bank_name)
--- values ('Brade', 'Hengerty', '840691711', '960308703', '9648362398', 'Flatley Bank');
 
 -- Transactions table
 insert into transactions (AMOUNT_SENT, TRANSACTION_FEE, RECIPIENT_GETS,  RECIPIENT_ID, MESSAGE, STATUS, CREATED_AT)
