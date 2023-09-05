@@ -55,6 +55,10 @@ public class Transaction implements Serializable {
     @Column(nullable = false)
     private Double recipientGets;
 
+    @NotNull(message = "The user id can't be null")
+    @Column(nullable = false)
+    private Long userId;
+
     @Column(name = "created_at")
     private String createdAt;
 

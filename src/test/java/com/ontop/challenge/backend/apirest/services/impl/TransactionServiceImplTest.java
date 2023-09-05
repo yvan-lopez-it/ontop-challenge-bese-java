@@ -85,7 +85,7 @@ class TransactionServiceImplTest {
 
     @Test
     public void testPerformWalletToBankTransaction() {
-        //TODO: testPerformWalletToBankTransaction() method
+
         Long userId = 1L;
         Long recipientId = 1L;
         Double amountSent = 10.0;

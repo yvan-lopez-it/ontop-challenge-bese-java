@@ -1,5 +1,7 @@
 package com.ontop.challenge.backend.apirest.services.impl;
 
+import com.ontop.challenge.backend.apirest.builders.TransactionBuilder;
+import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
 import com.ontop.challenge.backend.apirest.exceptions.RecipientNotFoundException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
 import com.ontop.challenge.backend.apirest.models.Recipient;
@@ -18,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class TransactionServiceImpl implements ITransactionService {
@@ -64,15 +65,19 @@ public class TransactionServiceImpl implements ITransactionService {
         Double transactionFee = this.calculateTransactionFee(amountSent);
         Double recipientGets = this.calculateRecipientGets(amountSent, transactionFee);
 
-        // Update wallet using WalletService
+        // Update wallet
         log.info("Perform update wallet call");
         walletService.updateWallet(userId, recipientGets, true);
 
         // Create and save transaction
-        Transaction savedTransaction = createAndSaveTransaction(amountSent, transactionFee, recipientGets, recipient);
+        Transaction savedTransaction = this.createAndSaveTransaction(userId, amountSent, transactionFee, recipientGets, recipient);
 
         // Perform payment
-        paymentService.performPayment(savedTransaction);
+        try {
+            paymentService.performPayment(savedTransaction);
+        } catch (Exception ex) {
+            handlePaymentException(savedTransaction, ex);
+        }
 
         return savedTransaction;
     }
@@ -103,28 +108,31 @@ public class TransactionServiceImpl implements ITransactionService {
         return amountSent - transactionFee;
     }
 
-    private Transaction createAndSaveTransaction(Double amountSent, Double transactionFee, Double recipientGets, Recipient recipient) {
+    private Transaction createAndSaveTransaction(Long userId, Double amountSent, Double transactionFee, Double recipientGets, Recipient recipient) {
         Status transactionStatus = Status.IN_PROGRESS;
-        Transaction transaction = this.buildTransaction(amountSent, transactionFee, recipientGets, recipient, txMsgDefault, transactionStatus);
+        Transaction transaction =
+            TransactionBuilder.buildTransaction(userId, amountSent, transactionFee, recipientGets, recipient, txMsgDefault, transactionStatus);
         return transactionDao.save(transaction);
-    }
-
-    private Transaction buildTransaction(Double amountSent, Double transactionFee, Double recipientGets, Recipient recipient,
-        String message, Status transactionStatus) {
-
-        return Transaction.builder()
-            .transactionFee(transactionFee)
-            .amountSent(amountSent)
-            .recipientGets(recipientGets)
-            .status(transactionStatus)
-            .recipient(recipient)
-            .message(message)
-            .build();
     }
 
     private Recipient getRecipient(Long recipientId) {
         return recipientDao.findById(recipientId).orElse(null);
     }
 
+    private void handlePaymentException(Transaction transaction, Exception ex) {
+        log.error("Error performing payment: " + ex.getMessage());
 
+        log.info("Transaction with status FAILED");
+        transaction.setStatus(Status.FAILED);
+        transactionDao.save(transaction);
+
+        // Proceed with refund
+        log.info("Proceed to refund");
+        walletService.updateWallet(transaction.getUserId(), transaction.getRecipientGets(), false);
+        transaction.setStatus(Status.REFUNDED);
+        transaction.setMessage(txMsgRefund);
+        transactionDao.save(transaction);
+
+        throw new BankTransferFailedException("Error performing payment: " + ex.getMessage(), ex);
+    }
 }

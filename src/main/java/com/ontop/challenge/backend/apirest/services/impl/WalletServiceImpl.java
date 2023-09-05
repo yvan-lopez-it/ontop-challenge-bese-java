@@ -3,9 +3,11 @@ package com.ontop.challenge.backend.apirest.services.impl;
 import com.ontop.challenge.backend.apirest.dto.BalanceResponseDto;
 import com.ontop.challenge.backend.apirest.dto.wallet.WalletTransactionRequestDto;
 import com.ontop.challenge.backend.apirest.dto.wallet.WalletTransactionResponseDto;
-import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletrRequestException;
+import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletRequestException;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -20,6 +22,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class WalletServiceImpl implements IWalletService {
+
+    private final Logger log = LoggerFactory.getLogger(WalletServiceImpl.class);
 
     private final String walletBalanceUrl;
     private final String walletTransactionsUrl;
@@ -37,16 +41,26 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public Double getBalance(Long userId) {
-        return this.fetchBalanceFromWallet(userId);
+        log.info("Fetching balance from Wallet API for user ID: {}", userId);
+
+        Double balance = this.fetchBalanceFromWallet(userId);
+
+        log.info("Balance retrieved successfully: {}", balance);
+
+        return balance;
     }
 
     @Override
     public void updateWallet(Long userId, Double amount, boolean isWithdraw) {
+        log.info("Updating wallet for user ID: {}. Amount: {}. IsWithdraw: {}", userId, amount, isWithdraw);
+
         try {
             WalletTransactionRequestDto walletTransactionRequestDto = buildWalletTransactionRequestDto(userId, amount, isWithdraw);
             createWalletTransaction(walletTransactionRequestDto);
-        } catch (HttpClientErrorException.BadRequest | HttpClientErrorException.NotFound | HttpServerErrorException.InternalServerError ex) {
-            throw new WalletrRequestException(ex.getMessage());
+            log.info("Wallet updated successfully for user ID: {}", userId);
+        } catch (HttpClientErrorException.BadRequest | HttpClientErrorException.NotFound | HttpServerErrorException.InternalServerError e) {
+            log.error("Error updating wallet for user ID: {}. Error message: {}", userId, e.getMessage());
+            throw new WalletRequestException(e.getMessage(), e);
         }
     }
 
@@ -79,11 +93,27 @@ public class WalletServiceImpl implements IWalletService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<WalletTransactionRequestDto> requestEntity = new HttpEntity<>(walletTransactionRequestDto, headers);
+        try {
+            HttpEntity<WalletTransactionRequestDto> requestEntity = new HttpEntity<>(walletTransactionRequestDto, headers);
 
-        ResponseEntity<WalletTransactionResponseDto> responseEntity = restTemplate.postForEntity(walletTransactionsUrl, requestEntity,
-            WalletTransactionResponseDto.class);
+            ResponseEntity<WalletTransactionResponseDto> responseEntity =
+                restTemplate.postForEntity(
+                    walletTransactionsUrl,
+                    requestEntity,
+                    WalletTransactionResponseDto.class
+                );
 
-        responseEntity.getBody();
+            log.info("Wallet transaction request sent successfully for user ID: {}", walletTransactionRequestDto.getUserId());
+            WalletTransactionResponseDto walletTransactionResponseDto = responseEntity.getBody();
+
+            if (walletTransactionResponseDto != null) {
+                log.info("Wallet transaction response received: {}", walletTransactionResponseDto);
+            }
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            log.error("Error sending wallet transaction request for user ID: {}. Error message: {}", walletTransactionRequestDto.getUserId(), e.getMessage());
+            throw new WalletRequestException("Error sending wallet transaction request", e);
+        }
+
+
     }
 }
