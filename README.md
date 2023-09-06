@@ -105,6 +105,9 @@ docker image
 docker run -p 8080:8080 {image ID associated}
 ```
 * You will see the container created and the app running.
+```bash
+docker run -d ontop-challenge
+```
 
 ### 6. Try it with Postman
 
