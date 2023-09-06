@@ -69,7 +69,7 @@ Another way is:
   your application into a JAR file.
 * `spring-boot:run`: This goal starts your Spring Boot application.
 
-#### Testing the app
+### Testing the app
 
 You can run unit tests and integration tests for your application components using the following
 Maven command:
@@ -108,6 +108,9 @@ docker run -p 8080:8080 {image ID associated}
 ```bash
 docker run -d ontop-challenge
 ```
+
+### Using the IDE
+For more information, please visit [Docker with IntelliJ](https://www.jetbrains.com/help/idea/docker.html)
 
 ### 6. Try it with Postman
 
