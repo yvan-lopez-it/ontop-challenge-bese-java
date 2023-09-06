@@ -109,15 +109,57 @@ docker run -p 8080:8080 {image ID associated}
 docker run -d ontop-challenge
 ```
 
+* If in some point you want to create and upload an image to a container, you can go with this:
+```bash
+mvn spring-boot:built-image
+``` 
+* It uses Maven to build your Spring Boot application, just like running `mvn clean install` 
+or `mvn package`. As we've seen above.
+
+* After the build is complete, it uses the Spring Boot Maven Plugin to create a Docker image 
+of your application. 
+This means it generates a Docker image containing your application's JAR file and its dependencies, 
+which can be run as a container.
+
+* By default, the Docker image is tagged with the name of your Maven project, 
+and it may use a default base image like `adoptopenjdk:11-jre-hotspot` for Java applications.
+You can customize the base image and other Docker-related settings in your Maven project's `pom.xml` file.
+
+* Once you've run `mvn spring-boot:build-image`, you'll find the Docker image for your Spring Boot 
+application in your local Docker image registry. 
+* You can then use standard Docker commands to run, push, or deploy the image to container orchestration platforms 
+like Docker Compose, Kubernetes, or Amazon ECS.
+
 ### Using the IDE
 For more information, please visit [Docker with IntelliJ](https://www.jetbrains.com/help/idea/docker.html)
 
+### AWS container services
+Additionally, the app is running in AWS Cloud, using these services:
+- [AWS ECS - Elastic Container Service](https://aws.amazon.com/es/ecs/)
+- [AWS Fargate](https://aws.amazon.com/en/fargate/)
+
+The IP address where the app was deployed is: http://107.23.182.179:8080/ 
+
 ### 6. Try it with Postman
 
-There's an attached file at the root called `Ontop Challenge BE Java.postman_collection.json` with
-the endpoints to try.
+Open the file called `Ontop Challenge BE Java.postman_collection.json` with the endpoints to try.
 
-[//]: # (TODO: Detail the endpoints to try)
+![img.png](img.png)
+
+There are 2 main endpoints and 3 helpers:
+
+### Perform tx
+It performs a transaction between the bank accounts and updates the balance.
+### Get all transactions by recipient
+It retrieves the transactions ordered by descending “creation date” (created_at) in a paginated table and
+filtered by amount and date.
+
+### Get all recipients
+Fetches all recipients in db.
+### Save recipients
+Persist a recipient in db.
+### Get recipìent by id
+Find a recipient by its id from db..
 
 ## Let's go!
 
