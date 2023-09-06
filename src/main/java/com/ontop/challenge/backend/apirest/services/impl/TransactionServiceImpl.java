@@ -10,6 +10,7 @@ import com.ontop.challenge.backend.apirest.models.Transaction.Status;
 import com.ontop.challenge.backend.apirest.repositories.IRecipientDao;
 import com.ontop.challenge.backend.apirest.repositories.ITransactionDao;
 import com.ontop.challenge.backend.apirest.services.IPaymentService;
+import com.ontop.challenge.backend.apirest.services.IRecipientService;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class TransactionServiceImpl implements ITransactionService {
 
     private final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
-    private final IRecipientDao recipientDao;
+    private final IRecipientService recipientService;
     private final ITransactionDao transactionDao;
     private final IWalletService walletService;
     private final IPaymentService paymentService;
@@ -41,10 +42,10 @@ public class TransactionServiceImpl implements ITransactionService {
 
 
     @Autowired
-    public TransactionServiceImpl(IWalletService walletService, IRecipientDao recipientDao, ITransactionDao transactionDao,
+    public TransactionServiceImpl(IWalletService walletService, IRecipientService recipientService, ITransactionDao transactionDao,
         IPaymentService paymentService, @Value("${fee.percentage.val}") Double feePercentageVal) {
         this.walletService = walletService;
-        this.recipientDao = recipientDao;
+        this.recipientService = recipientService;
         this.transactionDao = transactionDao;
         this.paymentService = paymentService;
         this.feePercentageVal = feePercentageVal;
@@ -54,12 +55,10 @@ public class TransactionServiceImpl implements ITransactionService {
     public Transaction performWalletToBankTransaction(Long userId, Long recipientId, Double amountSent) {
 
         // Check user balance
-        Double userBalance = walletService.getBalance(userId);
-        this.ensureSufficientBalance(userBalance, amountSent);
+        Double userBalance = walletService.getBalance(userId, amountSent);
 
         // Retrieve recipient
-        Recipient recipient = getRecipient(recipientId);
-        this.ensureRecipientExists(recipient);
+        Recipient recipient = recipientService.getRecipient(recipientId);
 
         // Calculate transaction fee and recipient gets
         Double transactionFee = this.calculateTransactionFee(amountSent);
@@ -75,8 +74,8 @@ public class TransactionServiceImpl implements ITransactionService {
         // Perform payment
         try {
             paymentService.performPayment(savedTransaction);
-        } catch (Exception ex) {
-            handlePaymentException(savedTransaction, ex);
+        } catch (BankTransferFailedException e) {
+            handlePaymentException(savedTransaction, e);
         }
 
         return savedTransaction;
@@ -86,18 +85,6 @@ public class TransactionServiceImpl implements ITransactionService {
     @Transactional(readOnly = true)
     public Page<Transaction> getTransactionsByRecipientId(Long recipientId, Pageable pageable) {
         return transactionDao.findByRecipientIdOrderByCreatedAtDesc(recipientId, pageable);
-    }
-
-    private void ensureSufficientBalance(Double userBalance, Double amountSent) {
-        if (userBalance < amountSent) {
-            throw new WalletInsufficientBalanceException("Insufficient balance amount.");
-        }
-    }
-
-    private void ensureRecipientExists(Recipient recipient) {
-        if (recipient == null) {
-            throw new RecipientNotFoundException("Recipient not found.");
-        }
     }
 
     private Double calculateTransactionFee(Double amountSent) {
@@ -115,10 +102,6 @@ public class TransactionServiceImpl implements ITransactionService {
         return transactionDao.save(transaction);
     }
 
-    private Recipient getRecipient(Long recipientId) {
-        return recipientDao.findById(recipientId).orElse(null);
-    }
-
     private void handlePaymentException(Transaction transaction, Exception ex) {
         log.error("Error performing payment: " + ex.getMessage());
 
@@ -126,6 +109,7 @@ public class TransactionServiceImpl implements ITransactionService {
         transaction.setStatus(Status.FAILED);
         transactionDao.save(transaction);
 
+        // TODO: Place this logic in a schedule config.
         // Proceed with refund
         log.info("Proceed to refund");
         walletService.updateWallet(transaction.getUserId(), transaction.getRecipientGets(), false);

@@ -4,6 +4,7 @@ import com.ontop.challenge.backend.apirest.dto.BalanceResponseDto;
 import com.ontop.challenge.backend.apirest.dto.wallet.WalletTransactionRequestDto;
 import com.ontop.challenge.backend.apirest.dto.wallet.WalletTransactionResponseDto;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.BalanceRequestException;
+import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletRequestException;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
 import java.util.Objects;
@@ -41,10 +42,13 @@ public class WalletServiceImpl implements IWalletService {
     }
 
     @Override
-    public Double getBalance(Long userId) {
+    public Double getBalance(Long userId, Double amountSent) {
+
         log.info("Fetching balance from Wallet API for user ID: {}", userId);
 
         Double balance = this.fetchBalanceFromWallet(userId);
+
+        this.ensureSufficientBalance(balance, amountSent);
 
         log.info("Balance retrieved successfully: {}", balance);
 
@@ -62,6 +66,12 @@ public class WalletServiceImpl implements IWalletService {
         } catch (HttpClientErrorException.BadRequest | HttpClientErrorException.NotFound | HttpServerErrorException.InternalServerError e) {
             log.error("Error updating wallet for user ID: {}. Error message: {}", userId, e.getMessage());
             throw new WalletRequestException(e.getMessage(), e);
+        }
+    }
+
+    private void ensureSufficientBalance(Double userBalance, Double amountSent) {
+        if (userBalance < amountSent) {
+            throw new WalletInsufficientBalanceException("Insufficient balance amount.");
         }
     }
 

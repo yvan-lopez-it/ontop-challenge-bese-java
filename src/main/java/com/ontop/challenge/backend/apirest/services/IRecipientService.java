@@ -10,4 +10,6 @@ public interface IRecipientService {
     Recipient findById(Long id);
 
     Recipient saveRecipient(Recipient recipient);
+
+    Recipient getRecipient(Long recipientId);
 }

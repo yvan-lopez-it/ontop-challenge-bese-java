@@ -2,6 +2,7 @@ package com.ontop.challenge.backend.apirest.controllers;
 
 import com.ontop.challenge.backend.apirest.dto.TransactionRequestDto;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
+import com.ontop.challenge.backend.apirest.exceptions.RecipientNotFoundException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.BalanceRequestException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
 import com.ontop.challenge.backend.apirest.models.Transaction;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -73,14 +73,14 @@ public class TransactionRestController {
         try {
             Transaction transaction = transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(), request.getAmount());
             return ResponseEntity.ok(transaction);
-        } catch (BankTransferFailedException | BalanceRequestException e) {
-            response.put("mesage", "There was an internal error.");
+        } catch (RecipientNotFoundException e) {
+            response.put("message", "Recipient not found.");
+            response.put("error", e.getMessage() + ": " + e.getCause());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (BankTransferFailedException | WalletInsufficientBalanceException | BalanceRequestException e) {
+            response.put("message", "There was an internal error.");
             response.put("error", e.getMessage() + ": " + e.getCause());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        } catch (WalletInsufficientBalanceException e) {
-            response.put("mesage", "There was bad request error.");
-            response.put("error", e.getMessage() + ": " + e.getCause());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
