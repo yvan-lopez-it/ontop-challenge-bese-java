@@ -13,6 +13,7 @@ Before you begin, ensure you have the following installed:
 - [Maven 3.9.x](https://maven.apache.org/install.html): You can follow
   the [installation instructions](https://maven.apache.org/install.html) for your operating system.
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/): Install IntelliJ IDEA, IDE recommended.
+- [Docker](https://www.docker.com/products/docker-desktop/): if you want to place the app inside a Docker container.
 
 ## Getting Started
 
@@ -52,7 +53,7 @@ password: password
 * In Intellij IDE you can Right-click on the `BackendApiRestApplication.java` file.
 * Select `Run BackendApiRestApplication` to build and run your Spring Boot application.
 
-Other way is:
+Another way is:
 
 * Open a terminal or command prompt.
 * Navigate to your project's root directory.
@@ -68,7 +69,7 @@ Other way is:
   your application into a JAR file.
 * `spring-boot:run`: This goal starts your Spring Boot application.
 
-### 5. Testing the app
+#### Testing the app
 
 You can run unit tests and integration tests for your application components using the following
 Maven command:
@@ -79,6 +80,31 @@ Maven command:
 
 * This command runs tests using JUnit and Mockito, which are commonly used testing frameworks in
   Java.
+
+### 5. Deploy it to a Docker container
+To achieve deployment to a Docker container, we need to run the Dockerfile. Follow these steps:
+
+* Make sure Docker is running.
+* Open a terminal and go to the project root.
+* Package the app with Maven:
+```bash
+mvn package
+```
+* Build the image by running this command:
+```bash
+docker build -t ontop-challenge-be:1.0.0 .
+```
+_(actually, you can write any `{description_name}:{x.y.z}` version)_
+* Now, run this command to see the images list:
+```bash
+docker image
+```
+* Looking for the repository named `ontop-challenge-be` and copy the image ID associated
+* Build the container from the image:
+```bash
+docker run -p 8080:8080 {image ID associated}
+```
+* You will see the container created and the app running.
 
 ### 6. Try it with Postman
 
