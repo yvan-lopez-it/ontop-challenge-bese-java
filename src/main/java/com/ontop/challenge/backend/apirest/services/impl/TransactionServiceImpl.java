@@ -81,10 +81,16 @@ public class TransactionServiceImpl implements ITransactionService {
         return savedTransaction;
     }
 
+//    @Override
+//    @Transactional(readOnly = true)
+//    public Page<Transaction> getTransactionsByRecipientId(Long recipientId, Pageable pageable) {
+//        return transactionDao.findByRecipientIdOrderByCreatedAtDesc(recipientId, pageable);
+//    }
+
     @Override
     @Transactional(readOnly = true)
-    public Page<Transaction> getTransactionsByRecipientId(Long recipientId, Pageable pageable) {
-        return transactionDao.findByRecipientIdOrderByCreatedAtDesc(recipientId, pageable);
+    public Page<Transaction> getTransactionsByRecipientId(Long recipientId, Double amountSent, String createdAt, Pageable pageable) {
+        return transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable);
     }
 
     private Double calculateTransactionFee(Double amountSent) {

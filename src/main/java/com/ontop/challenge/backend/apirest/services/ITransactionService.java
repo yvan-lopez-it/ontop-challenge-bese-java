@@ -8,5 +8,7 @@ public interface ITransactionService {
 
     Transaction performWalletToBankTransaction(Long userId, Long recipientId, Double amount);
 
-    Page<Transaction> getTransactionsByRecipientId(Long recipientId, Pageable pageable);
+    //Page<Transaction> getTransactionsByRecipientId(Long recipientId, Pageable pageable);
+
+    public Page<Transaction> getTransactionsByRecipientId(Long recipientId, Double amountSent, String createdAt, Pageable pageable);
 }

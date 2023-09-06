@@ -68,16 +68,19 @@ class TransactionServiceImplTest {
     public void testGetTransactionsByRecipientId() {
         // Prepare test data
         Long recipientId = 1L;
+        Double amountSent = 100.0;
+        String createdAt = "2023-09-04T10:00:00";
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt"));
 
         List<Transaction> transactions = Arrays.asList(transactionA, transactionB);
         Page<Transaction> expectedPage = new PageImpl<>(transactions);
 
         // Mock the repository method
-        when(transactionDao.findByRecipientIdOrderByCreatedAtDesc(recipientId, pageable)).thenReturn(expectedPage);
+        when(transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable))
+            .thenReturn(expectedPage);
 
         // Call the service method
-        Page<Transaction> result = transactionService.getTransactionsByRecipientId(recipientId, pageable);
+        Page<Transaction> result = transactionService.getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable);
 
         // Assert
         assertThat(result).isEqualTo(expectedPage);

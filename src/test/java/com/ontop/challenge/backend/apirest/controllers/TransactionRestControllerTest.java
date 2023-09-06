@@ -56,15 +56,19 @@ public class TransactionRestControllerTest {
     public void testGetTransactionsByRecipientId() {
         // Prepare test data
         Long recipientId = 1L;
+        Double amountSent = 100.0;
+        String createdAt = "2023-09-04T10:00:00";
         Pageable pageable = PageRequest.of(0, 2, Sort.by("createdAt"));
         List<Transaction> transactions = Arrays.asList(transactionA, transactionB);
         Page<Transaction> page = new PageImpl<>(transactions);
 
         // Mock the service method
-        when(transactionService.getTransactionsByRecipientId(recipientId, pageable)).thenReturn(page);
+        when(transactionService.getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable))
+            .thenReturn(page);
 
         // Perform the GET request to the controller
-        ResponseEntity<?> response = transactionController.getTransactionsByRecipientId(recipientId, 0, 2);
+        ResponseEntity<?> response = transactionController
+            .getTransactionsByRecipientId(recipientId, 0, 2, amountSent, createdAt);
 
         // Assert the response
         assertEquals(HttpStatus.OK, response.getStatusCode());

@@ -36,6 +36,8 @@ public class TransactionDaoTest {
     public void testFindByRecipientIdOrderByCreatedAtDesc() {
 
         Long recipientId = 1L;
+        Double amountSent = 100.0;
+        String createdAt = "2023-09-04T10:00:00";
         PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("createdAt")));
         List<Transaction> transactions = new ArrayList<>();
 
@@ -44,11 +46,11 @@ public class TransactionDaoTest {
         transactions.add(transactionB);
 
         // Mock the repository method call
-        when(transactionDao.findByRecipientIdOrderByCreatedAtDesc(eq(recipientId), eq(pageable)))
+        when(transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable))
             .thenReturn(new PageImpl<>(transactions));
 
         // Call the repository method
-        Page<Transaction> result = transactionDao.findByRecipientIdOrderByCreatedAtDesc(recipientId, pageable);
+        Page<Transaction> result = transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable);
 
         // Assertions
         assertThat(result).isNotNull();

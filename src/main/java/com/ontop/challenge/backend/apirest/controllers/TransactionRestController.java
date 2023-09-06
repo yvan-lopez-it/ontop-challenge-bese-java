@@ -48,9 +48,13 @@ public class TransactionRestController {
     public ResponseEntity<?> getTransactionsByRecipientId(
         @PathVariable Long recipientId,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "2") int size) {
+        @RequestParam(defaultValue = "2") int size,
+        @RequestParam(required = false) Double amountSent,
+        @RequestParam(required = false) String createdAt
+    ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt"));
-        Page<Transaction> transactions = transactionService.getTransactionsByRecipientId(recipientId, pageable);
+        Page<Transaction> transactions = transactionService
+            .getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable);
 
         return ResponseEntity.ok(transactions);
     }
