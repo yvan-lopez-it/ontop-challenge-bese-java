@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionRestControllerTest {
@@ -79,8 +81,12 @@ public class TransactionRestControllerTest {
             transactionRequestDto.getAmount())
         ).thenReturn(transactionA);
 
+        // Prepare a mock BindingResult with validation errors
+        BindingResult mockBindingResult = Mockito.mock(BindingResult.class);
+        when(mockBindingResult.hasErrors()).thenReturn(false);
+
         // Perform the POST request to the controller
-        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto);
+        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto, mockBindingResult);
 
         // Assert the response
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -97,8 +103,12 @@ public class TransactionRestControllerTest {
             transactionRequestDto.getAmount())
         ).thenThrow(new WalletInsufficientBalanceException("Insufficient Balance"));
 
+        // Prepare a mock BindingResult with validation errors
+        BindingResult mockBindingResult = Mockito.mock(BindingResult.class);
+        when(mockBindingResult.hasErrors()).thenReturn(false);
+
         // Perform the POST request to the controller
-        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto);
+        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto, mockBindingResult);
 
         // Assert the response
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -114,8 +124,12 @@ public class TransactionRestControllerTest {
             transactionRequestDto.getAmount())
         ).thenThrow(new BankTransferFailedException("Bank transfer failed"));
 
+        // Prepare a mock BindingResult with validation errors
+        BindingResult mockBindingResult = Mockito.mock(BindingResult.class);
+        when(mockBindingResult.hasErrors()).thenReturn(false);
+
         // Perform the POST request to the controller
-        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto);
+        ResponseEntity<?> response = transactionController.performTransaction(transactionRequestDto, mockBindingResult);
 
         // Assert the response
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());

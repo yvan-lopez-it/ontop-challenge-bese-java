@@ -3,6 +3,7 @@ package com.ontop.challenge.backend.apirest.services.impl;
 import com.ontop.challenge.backend.apirest.dto.BalanceResponseDto;
 import com.ontop.challenge.backend.apirest.dto.wallet.WalletTransactionRequestDto;
 import com.ontop.challenge.backend.apirest.dto.wallet.WalletTransactionResponseDto;
+import com.ontop.challenge.backend.apirest.exceptions.wallet.BalanceRequestException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletRequestException;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
 import java.util.Objects;
@@ -68,16 +69,22 @@ public class WalletServiceImpl implements IWalletService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String url = walletBalanceUrl + "?user_id=" + userId;
+        try {
+            String url = walletBalanceUrl + "?user_id=" + userId;
 
-        ResponseEntity<BalanceResponseDto> responseEntity = restTemplate.exchange(
-            url,
-            HttpMethod.GET,
-            new HttpEntity<>(headers),
-            BalanceResponseDto.class
-        );
+            ResponseEntity<BalanceResponseDto> responseEntity = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                BalanceResponseDto.class
+            );
 
-        return Objects.requireNonNull(responseEntity.getBody()).getBalance();
+            return Objects.requireNonNull(responseEntity.getBody()).getBalance();
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            log.error("Error fetching balance from wallet request for user ID: {}. Error message: {}", userId, e.getMessage());
+            throw new BalanceRequestException("Error fetching balance from wallet request", e);
+        }
+
     }
 
     private WalletTransactionRequestDto buildWalletTransactionRequestDto(Long userId, Double amount, boolean isWithdraw) {

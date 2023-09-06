@@ -117,6 +117,8 @@ For more information, please visit [Docker with IntelliJ](https://www.jetbrains.
 There's an attached file at the root called `Ontop Challenge BE Java.postman_collection.json` with
 the endpoints to try.
 
+[//]: # (TODO: Detail the endpoints to try)
+
 ## Let's go!
 
 That's it! You've successfully set up, configured, and run your Spring Boot REST API application in
