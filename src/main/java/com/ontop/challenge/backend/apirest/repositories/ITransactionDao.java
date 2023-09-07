@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ITransactionDao extends JpaRepository<Transaction, Long> {
 
-    //    Page<Transaction> findByRecipientIdOrderByCreatedAtDesc(Long recipientId, Pageable pageable);
-
     @Query("SELECT t FROM Transaction t WHERE t.recipient.id = :recipientId " +
         "AND (:amountSent is null OR t.amountSent = :amountSent) " +
         "AND (SUBSTRING(t.createdAt, 1, 10) = :createdAt OR :createdAt IS NULL) " +

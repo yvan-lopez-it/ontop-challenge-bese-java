@@ -32,11 +32,11 @@ public class TransactionDaoTest {
     private Transaction transactionB;
 
     @Test
-    public void testFindByRecipientIdOrderByCreatedAtDesc() {
+    public void testFindTransactionsByRecipientIdAndFilters() {
 
         Long recipientId = 1L;
-        Double amountSent = 100.0;
-        String createdAt = "2023-09-04T10:00:00";
+        Double amountSent = 1000.0;
+        String createdAt = "2023-09-04";
         PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("createdAt")));
         List<Transaction> transactions = new ArrayList<>();
 
@@ -54,6 +54,6 @@ public class TransactionDaoTest {
         // Assertions
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(transactions.size());
-        // You can add more assertions as needed
+
     }
 }

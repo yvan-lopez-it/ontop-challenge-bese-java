@@ -115,7 +115,7 @@ class TransactionServiceImplTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(PaymentResponseDto.class)))
             .thenReturn(new ResponseEntity<>(new PaymentResponseDto(), HttpStatus.OK));
 
-        // Act
+        // Mocking performWalletToBankTransaction
         ITransactionService transactionServiceMock = mock(ITransactionService.class);
         transactionServiceMock.performWalletToBankTransaction(userId, recipientId, amountSent);
 
