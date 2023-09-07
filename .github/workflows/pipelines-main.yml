@@ -1,0 +1,68 @@
+name: Build and deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-build-publish-deploy:
+    if: github.repository == 'yvan-lopez-it/ontop-challenge-bese-java'
+    name: Setup, build, publish and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up Java 17
+      - name: Set up jdk17
+        uses: actions/checkout@v4
+        with:
+          java-version: 17
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      # Build and test with Maven
+      - name: Build and test with Maven
+        run: mvn package
+
+      # Docker
+      - name: Docker login
+        uses: actions/checkout@v4
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag ontop-challenge-be:1.0.0
+
+      - name: Docker push
+        run: docker push ontop-challenge-be:${{ github.sha }}
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # Push the new image ID in the Amazon ECS task definition
+      - name: Push the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ontop-challenge-be-container
+          image: ${{ steps.build-image.outputs.image }}
+
+      # Deploy Amazon ECS task definition
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ontop-challenge-be-service
+          cluster: ontop-challenge-bese-cluster
+          wait-for-service-stability: true
