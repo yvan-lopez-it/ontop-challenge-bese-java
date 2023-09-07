@@ -42,7 +42,7 @@ public class WalletServiceImpl implements IWalletService {
     }
 
     @Override
-    public Double getBalance(Long userId, Double amountSent) {
+    public void checkBalance(Long userId, Double amountSent) {
 
         log.info("Fetching balance from Wallet API for user ID: {}", userId);
 
@@ -51,8 +51,6 @@ public class WalletServiceImpl implements IWalletService {
         this.ensureSufficientBalance(balance, amountSent);
 
         log.info("Balance retrieved successfully: {}", balance);
-
-        return balance;
     }
 
     @Override

@@ -2,12 +2,9 @@ package com.ontop.challenge.backend.apirest.services.impl;
 
 import com.ontop.challenge.backend.apirest.builders.TransactionBuilder;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
-import com.ontop.challenge.backend.apirest.exceptions.RecipientNotFoundException;
-import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
 import com.ontop.challenge.backend.apirest.models.Recipient;
 import com.ontop.challenge.backend.apirest.models.Transaction;
 import com.ontop.challenge.backend.apirest.models.Transaction.Status;
-import com.ontop.challenge.backend.apirest.repositories.IRecipientDao;
 import com.ontop.challenge.backend.apirest.repositories.ITransactionDao;
 import com.ontop.challenge.backend.apirest.services.IPaymentService;
 import com.ontop.challenge.backend.apirest.services.IRecipientService;
@@ -55,7 +52,7 @@ public class TransactionServiceImpl implements ITransactionService {
     public Transaction performWalletToBankTransaction(Long userId, Long recipientId, Double amountSent) {
 
         // Check user balance
-        Double userBalance = walletService.getBalance(userId, amountSent);
+        walletService.checkBalance(userId, amountSent);
 
         // Retrieve recipient
         Recipient recipient = recipientService.getRecipient(recipientId);
@@ -80,12 +77,6 @@ public class TransactionServiceImpl implements ITransactionService {
 
         return savedTransaction;
     }
-
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Page<Transaction> getTransactionsByRecipientId(Long recipientId, Pageable pageable) {
-//        return transactionDao.findByRecipientIdOrderByCreatedAtDesc(recipientId, pageable);
-//    }
 
     @Override
     @Transactional(readOnly = true)
@@ -116,6 +107,7 @@ public class TransactionServiceImpl implements ITransactionService {
         transactionDao.save(transaction);
 
         // TODO: Place this logic in a schedule config.
+        // TODO: add to Transaction entity a Withdraw and TopUp wallet transaction status. Later we can filter the txs to refund.
         // Proceed with refund
         log.info("Proceed to refund");
         walletService.updateWallet(transaction.getUserId(), transaction.getRecipientGets(), false);
