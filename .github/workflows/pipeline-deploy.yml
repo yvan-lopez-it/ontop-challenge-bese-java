@@ -1,0 +1,28 @@
+name: Build and deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-build-publish-deploy:
+    if: github.repository == 'yvan-lopez-it/ontop-challenge-bese-java'
+    name: Setup, build, publish and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up Java 17
+      - name: Set up jdk17
+        uses: actions/checkout@v4
+        with:
+          java-version: 17
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      # Build and test with Maven
+      - name: Build and test with Maven
+        run: mvn package
