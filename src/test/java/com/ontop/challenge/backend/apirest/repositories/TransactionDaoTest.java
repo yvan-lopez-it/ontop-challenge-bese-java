@@ -2,7 +2,6 @@ package com.ontop.challenge.backend.apirest.repositories;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.ontop.challenge.backend.apirest.models.Transaction;

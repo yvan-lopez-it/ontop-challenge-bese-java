@@ -159,7 +159,7 @@ Fetches all recipients in db.
 ### Save recipients
 Persist a recipient in db.
 ### Get recipìent by id
-Find a recipient by its id from db..
+Find a recipient by its id from db.
 
 ## Let's go!
 
