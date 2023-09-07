@@ -35,7 +35,7 @@ jobs:
         run: docker build . --file Dockerfile --tag yvancho/ontop-challenge-be:1.0.0
 
       - name: Docker push
-        run: ocker push yvancho/ontop-challenge-be:1.0.0
+        run: docker push yvancho/ontop-challenge-be:1.0.0
 
       - name: Configure AWS credentials
         run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set aws_region us-east-1
