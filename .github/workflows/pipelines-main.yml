@@ -51,11 +51,13 @@ jobs:
       # Push the new image ID in the Amazon ECS task definition
       - name: Push the new image ID in the Amazon ECS task definition
         id: task-def
+        env:
+          DOCKER_IMG: yvancho/ontop-challenge-be:1.0.0
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
           container-name: ontop-challenge-be-container
-          image: ${{ steps.build-image.outputs.image }}
+          image: $DOCKER_IMG
 
       # Deploy Amazon ECS task definition
       - name: Deploy Amazon ECS task definition
