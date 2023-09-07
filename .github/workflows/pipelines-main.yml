@@ -57,7 +57,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ontop-challenge-be-container
-          image: $DOCKER_IMG
+          image: ${{ env.DOCKER_IMG }}
 
       # Deploy Amazon ECS task definition
       - name: Deploy Amazon ECS task definition
