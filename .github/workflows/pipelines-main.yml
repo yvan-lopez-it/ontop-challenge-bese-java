@@ -15,11 +15,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up Java 17
-      - name: Set up jdk17
+      # Set up Java 11
+      - name: Set up jdk11
         uses: actions/checkout@v4
         with:
-          java-version: 17
+          java-version: 11
           server-id: github
           settings-path: ${{ github.workspace }}
 
