@@ -1,4 +1,4 @@
-package com.ontop.challenge.backend.apirest.jobs;
+package com.ontop.challenge.backend.apirest.tasks;
 
 import com.ontop.challenge.backend.apirest.builders.TransactionBuilder;
 import com.ontop.challenge.backend.apirest.models.Transaction;
