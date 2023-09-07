@@ -25,7 +25,7 @@ jobs:
 
       # Build and test with Maven
       - name: Build and test with Maven
-        run: mvn package
+        run: mvn spring-boot:built-image
 
       # Docker
       - name: Docker login
