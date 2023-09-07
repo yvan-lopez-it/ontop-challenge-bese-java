@@ -32,10 +32,10 @@ jobs:
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ontop-challenge-be:1.0.0
+        run: docker build . --file Dockerfile --tag yvancho/ontop-challenge-be:1.0.0
 
       - name: Docker push
-        run: docker push ontop-challenge-be:1.0.0
+        run: ocker push yvancho/ontop-challenge-be:1.0.0
 
       - name: Configure AWS credentials
         run: aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} && aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} && aws configure set aws_region us-east-1
