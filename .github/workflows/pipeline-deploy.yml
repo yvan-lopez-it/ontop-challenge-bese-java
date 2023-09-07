@@ -31,4 +31,4 @@ jobs:
 
       # Build and test with Maven
       - name: Build and test with Maven
-        run: mvn clean install package
+        run: mvn spring-boot:built-image
