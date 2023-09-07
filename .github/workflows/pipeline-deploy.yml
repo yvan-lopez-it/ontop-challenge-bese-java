@@ -22,13 +22,7 @@ jobs:
           java-version: 11
           server-id: github
           settings-path: ${{ github.workspace }}
-      
-      # Set up Maven
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
-        with:
-          maven-version: 3.9.1
-
+          
       # Build and test with Maven
       - name: Build and test with Maven
         run: mvn spring-boot:built-image
