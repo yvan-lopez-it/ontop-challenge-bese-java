@@ -10,6 +10,7 @@ import com.ontop.challenge.backend.apirest.services.IPaymentService;
 import com.ontop.challenge.backend.apirest.services.IRecipientService;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,6 @@ public class TransactionServiceImpl implements ITransactionService {
     @Value("${transaction.messages.default}")
     private String txMsgDefault;
 
-    @Value("${transaction.messages.refund}")
-    private String txMsgRefund;
-
-
     @Autowired
     public TransactionServiceImpl(IWalletService walletService, IRecipientService recipientService, ITransactionDao transactionDao,
         IPaymentService paymentService, @Value("${fee.percentage.val}") Double feePercentageVal) {
@@ -46,6 +43,11 @@ public class TransactionServiceImpl implements ITransactionService {
         this.transactionDao = transactionDao;
         this.paymentService = paymentService;
         this.feePercentageVal = feePercentageVal;
+    }
+
+    @Override
+    public List<Transaction> saveAllTransactions(List<Transaction> transactions) {
+        return transactionDao.saveAll(transactions);
     }
 
     @Override
@@ -72,7 +74,8 @@ public class TransactionServiceImpl implements ITransactionService {
         try {
             paymentService.performPayment(savedTransaction);
         } catch (BankTransferFailedException e) {
-            handlePaymentException(savedTransaction, e);
+            log.error("Error performing payment: " + e.getMessage());
+            this.handlePaymentException(savedTransaction, e);
         }
 
         return savedTransaction;
@@ -82,6 +85,12 @@ public class TransactionServiceImpl implements ITransactionService {
     @Transactional(readOnly = true)
     public Page<Transaction> getTransactionsByRecipientId(Long recipientId, Double amountSent, String createdAt, Pageable pageable) {
         return transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Transaction> findByStatus(Status status) {
+        return transactionDao.findByStatus(status);
     }
 
     private Double calculateTransactionFee(Double amountSent) {
@@ -95,26 +104,16 @@ public class TransactionServiceImpl implements ITransactionService {
     private Transaction createAndSaveTransaction(Long userId, Double amountSent, Double transactionFee, Double recipientGets, Recipient recipient) {
         Status transactionStatus = Status.IN_PROGRESS;
         Transaction transaction =
-            TransactionBuilder.buildTransaction(userId, amountSent, transactionFee, recipientGets, recipient, txMsgDefault, transactionStatus);
+            TransactionBuilder
+                .buildTransaction(userId, amountSent, transactionFee, recipientGets, recipient, txMsgDefault, transactionStatus);
         return transactionDao.save(transaction);
     }
 
-    private void handlePaymentException(Transaction transaction, Exception ex) {
-        log.error("Error performing payment: " + ex.getMessage());
-
-        log.info("Transaction with status FAILED");
-        transaction.setStatus(Status.FAILED);
+    private void handlePaymentException(Transaction transaction, Exception e) {
+        log.info("Transaction with status FAILED_TO_REFUND");
+        transaction.setStatus(Status.FAILED_TO_REFUND);
         transactionDao.save(transaction);
 
-        // TODO: Place this logic in a schedule config.
-        // TODO: add to Transaction entity a Withdraw and TopUp wallet transaction status. Later we can filter the txs to refund.
-        // Proceed with refund
-        log.info("Proceed to refund");
-        walletService.updateWallet(transaction.getUserId(), transaction.getRecipientGets(), false);
-        transaction.setStatus(Status.REFUNDED);
-        transaction.setMessage(txMsgRefund);
-        transactionDao.save(transaction);
-
-        throw new BankTransferFailedException("Error performing payment: " + ex.getMessage(), ex);
+        throw new BankTransferFailedException("Error performing payment: " + e.getMessage(), e);
     }
 }

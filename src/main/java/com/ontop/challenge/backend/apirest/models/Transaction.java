@@ -50,6 +50,12 @@ public class Transaction implements Serializable {
     @Column(nullable = false)
     private Double recipientGets;
 
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private Double refundedAmount;
+
+    @Column(nullable = true)
+    private Long associatedTransactionId;
+
     @NotNull(message = "The user id can't be null")
     @Column(nullable = false)
     private Long userId;
@@ -64,9 +70,9 @@ public class Transaction implements Serializable {
         this.createdAt = dateFormat.format(date);
     }
 
-    // Define enum for transaction status
+    // Transaction status
     public enum Status {
-        COMPLETED, REFUNDED, FAILED, IN_PROGRESS
+        IN_PROGRESS, COMPLETED, REFUNDED, FAILED, FAILED_TO_REFUND
     }
 
     @NotNull(message = "The status can't be null")

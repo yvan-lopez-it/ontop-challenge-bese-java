@@ -12,8 +12,15 @@ Before you begin, ensure you have the following installed:
   is installed on your system.
 - [Maven 3.9.x](https://maven.apache.org/install.html): You can follow
   the [installation instructions](https://maven.apache.org/install.html) for your operating system.
-- [IntelliJ IDEA](https://www.jetbrains.com/idea/download/): Install IntelliJ IDEA, IDE recommended.
+- [IntelliJ IDEA](https://www.jetbrains.com/idea/download/): Install IntelliJ IDEA, IDE recommended. Or another you feel most comfortable.
 - [Docker](https://www.docker.com/products/docker-desktop/): if you want to place the app inside a Docker container.
+
+To deploy in AWS Cloud using CI/CD, you'll need accounts in:
+- [Docker Hub](https://hub.docker.com/): To upload images.
+- [GitHub](https://github.com/): To upload the code on repos and use later
+[GitHub Actions](https://github.com/features/actions) to CI/CD. 
+- [AWS Cloud](https://aws.amazon.com/): To make use of [AWS ECS](https://aws.amazon.com/ecs/) 
+& [AWS Fargate](https://aws.amazon.com/es/fargate/). We'll use these services to manage containers and deploy the images.
 
 ## Getting Started
 
@@ -150,14 +157,17 @@ There are 2 main endpoints and 3 helpers:
 
 ### Perform tx
 It performs a transaction between the bank accounts and updates the balance.
+
 ### Get all transactions by recipient
 It retrieves the transactions ordered by descending “creation date” (created_at) in a paginated table and
 filtered by amount and date.
 
 ### Get all recipients
 Fetches all recipients in db.
+
 ### Save recipients
 Persist a recipient in db.
+
 ### Get recipìent by id
 Find a recipient by its id from db.
 
