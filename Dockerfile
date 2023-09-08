@@ -3,8 +3,9 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn -e -B dependency:resolve
 COPY src ./src
-RUN mvn -e -B package
+RUN mvn -e -B package -Pdev # Dev profile
 
 FROM openjdk:17-alpine
 COPY --from=builder /app/target/ontop-challenge-bese-java-0.0.1-SNAPSHOT.jar /app.jar
+ENV SPRING_PROFILES_ACTIVE=dev
 CMD ["java", "-jar", "/app.jar"]
