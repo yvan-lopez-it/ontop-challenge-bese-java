@@ -2,6 +2,7 @@ package com.ontop.challenge.backend.apirest.services.impl;
 
 import com.ontop.challenge.backend.apirest.builders.TransactionBuilder;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
+import com.ontop.challenge.backend.apirest.exceptions.payment.PaymentRequestException;
 import com.ontop.challenge.backend.apirest.models.Recipient;
 import com.ontop.challenge.backend.apirest.models.Transaction;
 import com.ontop.challenge.backend.apirest.models.Transaction.Status;
@@ -63,7 +64,7 @@ public class TransactionServiceImpl implements ITransactionService {
         Double transactionFee = this.calculateTransactionFee(amountSent);
         Double recipientGets = this.calculateRecipientGets(amountSent, transactionFee);
 
-        // Update wallet
+        // Update wallet balance
         log.info("Perform update wallet call");
         walletService.updateWallet(userId, recipientGets, true);
 
@@ -73,7 +74,7 @@ public class TransactionServiceImpl implements ITransactionService {
         // Perform payment
         try {
             paymentService.performPayment(savedTransaction);
-        } catch (BankTransferFailedException e) {
+        } catch (PaymentRequestException e) {
             log.error("Error performing payment: " + e.getMessage());
             this.handlePaymentException(savedTransaction, e);
         }

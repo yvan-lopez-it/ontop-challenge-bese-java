@@ -45,7 +45,7 @@ public class RefundScheduledTask {
                 // Update user wallet balance
                 walletService.updateWallet(failedTransaction.getUserId(), failedTransaction.getRecipientGets(), false);
 
-                // Set refund transaction and add to list
+                // Create refund transaction and add to list
                 Transaction refundedTransaction = this.createRefundTransaction(failedTransaction);
                 refundedTransactions.add(refundedTransaction);
 

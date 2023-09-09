@@ -44,21 +44,6 @@ public class TransactionRestController {
         this.transactionService = transactionService;
     }
 
-    @GetMapping("/recipient/{recipientId}")
-    public ResponseEntity<?> getTransactionsByRecipientId(
-        @PathVariable Long recipientId,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "2") int size,
-        @RequestParam(required = false) Double amountSent,
-        @RequestParam(required = false) String createdAt
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt"));
-        Page<Transaction> transactions = transactionService
-            .getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable);
-
-        return ResponseEntity.ok(transactions);
-    }
-
     @PostMapping("/perform")
     public ResponseEntity<?> performTransaction(@RequestBody @Valid TransactionRequestDto request, BindingResult result) {
 
@@ -86,6 +71,21 @@ public class TransactionRestController {
             response.put("error", e.getMessage() + ": " + e.getCause());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    @GetMapping("/recipient/{recipientId}")
+    public ResponseEntity<?> getTransactionsByRecipientId(
+        @PathVariable Long recipientId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "2") int size,
+        @RequestParam(required = false) Double amountSent,
+        @RequestParam(required = false) String createdAt
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt"));
+        Page<Transaction> transactions = transactionService
+            .getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable);
+
+        return ResponseEntity.ok(transactions);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

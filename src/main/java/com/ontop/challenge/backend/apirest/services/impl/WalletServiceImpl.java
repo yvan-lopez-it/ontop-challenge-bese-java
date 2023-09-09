@@ -59,7 +59,7 @@ public class WalletServiceImpl implements IWalletService {
 
         try {
             WalletTransactionRequestDto walletTransactionRequestDto = buildWalletTransactionRequestDto(userId, amount, isWithdraw);
-            createWalletTransaction(walletTransactionRequestDto);
+            this.createWalletTransaction(walletTransactionRequestDto);
             log.info("Wallet updated successfully for user ID: {}", userId);
         } catch (HttpClientErrorException.BadRequest | HttpClientErrorException.NotFound | HttpServerErrorException.InternalServerError e) {
             log.error("Error updating wallet for user ID: {}. Error message: {}", userId, e.getMessage());

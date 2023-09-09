@@ -1,8 +1,27 @@
 # Ontop Challenge Backend API
 
 This guide provides step-by-step instructions for **locally** setting up, configuring, and running
-the Ontop
-Challenge Backend API using IntelliJ IDEA, Maven, Spring Boot, and an embedded H2 database.
+the Ontop Challenge Backend API using IntelliJ IDEA, Maven, Spring Boot, and an embedded H2 database.
+
+## Table of contents
+[Prerequisites](#prerequisites)
+
+[Getting Started](#getting-started)
+
+1. [Clone the Repository](#1-clone-the-repository)
+2. [Configure Application Properties](#2-configure-application-properties)
+3. [Create Data SQL File](#3-create-data-sql-file)
+4. [Run the Application](#4-run-the-application)
+   - [Testing the app](#testing-the-app)
+5. [Deploy it to a Docker container](#5-deploy-it-to-a-docker-container)
+   - [Using the IDE](#using-the-ide)
+   - [AWS container services](#aws-container-services)
+6. [Try it with Postman](#6-try-it-with-postman)
+   - [Perform transaction](#perform-transaction)
+   - [Get all transactions by recipient (ordered and filtered)](#get-all-transactions-by-recipient-ordered-and-filtered)
+   - [Get all recipients](#get-all-recipients)
+   - [Save recipients](#save-recipients)
+   - [Get recipìent by id](#get-recipient-by-id)
 
 ## Prerequisites
 
@@ -155,10 +174,10 @@ Open the file called `Ontop Challenge BE Java.postman_collection.json` with the 
 
 There are 2 main endpoints and 3 helpers:
 
-### Perform tx
+### Perform transaction
 It performs a transaction between the bank accounts and updates the balance.
 
-### Get all transactions by recipient
+### Get all transactions by recipient (ordered and filtered)
 It retrieves the transactions ordered by descending “creation date” (created_at) in a paginated table and
 filtered by amount and date.
 
@@ -168,7 +187,7 @@ Fetches all recipients in db.
 ### Save recipients
 Persist a recipient in db.
 
-### Get recipìent by id
+### Get recipient by id
 Find a recipient by its id from db.
 
 ## Let's go!
