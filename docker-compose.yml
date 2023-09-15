@@ -1,25 +1,44 @@
-version: '3'
+version: '3.8'
+
 services:
+
   postgres:
     image: postgres:15
-    container_name: ontop-postgres-container
-    environment:
-      POSTGRES_DB: ontopdb
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
     ports:
       - "5432:5432"
+#    volumes:
+#      - 'postgres-data:/var/lib/postgresql/data'
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ontopdb-dev
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mynet
 
-  spring-boot-app:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ontop-springboot-app-container
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL_DEV: jdbc:postgresql://postgres:5432/ontopdb
-      DATABASE_USERNAME_DEV: myuser
-      DATABASE_PASSWORD_DEV: mypassword
+      DATABASE_URL_DEV: jdbc:postgresql://postgres:5432/ontopdb-dev
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: dev
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
+

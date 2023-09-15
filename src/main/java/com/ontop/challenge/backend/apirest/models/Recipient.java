@@ -27,7 +27,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @Entity
-@Table(name = "recipients")
+@Table(name = "recipients", schema = "public")
 public class Recipient implements Serializable {
 
     @Serial

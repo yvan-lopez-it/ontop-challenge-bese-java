@@ -24,7 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "transactions", schema = "public")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -50,7 +50,7 @@ public class Transaction implements Serializable {
     @Column(nullable = false)
     private Double recipientGets;
 
-    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    @Column(nullable = false, columnDefinition = "DOUBLE PRECISION DEFAULT 0.0")
     private Double refundedAmount;
 
     @Column(nullable = true)
