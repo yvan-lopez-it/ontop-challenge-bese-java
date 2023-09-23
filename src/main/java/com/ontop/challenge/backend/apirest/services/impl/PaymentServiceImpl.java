@@ -4,8 +4,9 @@ import com.ontop.challenge.backend.apirest.builders.PaymentRequestDtoBuilder;
 import com.ontop.challenge.backend.apirest.dto.payment.request.PaymentRequestDto;
 import com.ontop.challenge.backend.apirest.dto.payment.response.PaymentResponseDto;
 import com.ontop.challenge.backend.apirest.exceptions.payment.PaymentRequestException;
-import com.ontop.challenge.backend.apirest.models.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
 import com.ontop.challenge.backend.apirest.services.IPaymentService;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +37,12 @@ public class PaymentServiceImpl implements IPaymentService {
     }
 
     @Override
-    public void performPayment(Transaction transaction) {
+    public void performPayment(@NotNull Transaction transaction) {
         PaymentRequestDto paymentRequestDto = PaymentRequestDtoBuilder.buildPaymentRequestDto(transaction);
         this.sendPaymentRequest(paymentRequestDto, transaction);
     }
 
-    private void sendPaymentRequest(PaymentRequestDto paymentRequestDto, Transaction transaction) {
+    private void sendPaymentRequest(PaymentRequestDto paymentRequestDto, @NotNull Transaction transaction) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

@@ -5,7 +5,7 @@ import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedExceptio
 import com.ontop.challenge.backend.apirest.exceptions.RecipientNotFoundException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.BalanceRequestException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
-import com.ontop.challenge.backend.apirest.models.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,7 +46,7 @@ public class TransactionRestController {
     }
 
     @PostMapping("/perform")
-    public ResponseEntity<?> performTransaction(@RequestBody @Valid TransactionRequestDto request, BindingResult result) {
+    public @NotNull ResponseEntity<?> performTransaction(@RequestBody @Valid @NotNull TransactionRequestDto request, @NotNull BindingResult result) {
 
         Map<String, Object> response = new HashMap<>();
 
@@ -63,7 +64,7 @@ public class TransactionRestController {
             Transaction transaction = transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(), request.getAmount());
             return ResponseEntity.ok(transaction);
         } catch (RecipientNotFoundException e) {
-            response.put("message", "Recipient not found.");
+            response.put("message", "RecipientEntity not found.");
             response.put("error", e.getMessage() + ": " + e.getCause());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (BankTransferFailedException | WalletInsufficientBalanceException | BalanceRequestException e) {
@@ -74,7 +75,7 @@ public class TransactionRestController {
     }
 
     @GetMapping("/recipient/{recipientId}")
-    public ResponseEntity<?> getTransactionsByRecipientId(
+    public @NotNull ResponseEntity<?> getTransactionsByRecipientId(
         @PathVariable Long recipientId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "2") int size,
@@ -90,7 +91,7 @@ public class TransactionRestController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public @NotNull Map<String, String> handleValidationExceptions(@NotNull MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();

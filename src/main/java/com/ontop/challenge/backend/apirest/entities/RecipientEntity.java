@@ -1,4 +1,4 @@
-package com.ontop.challenge.backend.apirest.models;
+package com.ontop.challenge.backend.apirest.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
@@ -19,6 +19,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 
 @Data
@@ -28,7 +29,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "recipients", schema = "public")
-public class Recipient implements Serializable {
+public class RecipientEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 4051255552006179927L;
@@ -69,6 +70,6 @@ public class Recipient implements Serializable {
 
     @OneToMany(mappedBy = "recipient")
     @JsonIgnoreProperties({"recipient", "hibernateLazyInitializer", "handler"})
-    private List<Transaction> transactions = new ArrayList<>();
+    private @NotNull List<Transaction> transactions = new ArrayList<>();
 
 }

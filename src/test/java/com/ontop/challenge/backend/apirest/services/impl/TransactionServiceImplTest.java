@@ -13,8 +13,8 @@ import static org.mockito.Mockito.when;
 import com.ontop.challenge.backend.apirest.dto.BalanceResponseDto;
 import com.ontop.challenge.backend.apirest.dto.payment.response.PaymentResponseDto;
 import com.ontop.challenge.backend.apirest.dto.wallet.WalletTransactionResponseDto;
-import com.ontop.challenge.backend.apirest.models.Recipient;
-import com.ontop.challenge.backend.apirest.models.Transaction;
+import com.ontop.challenge.backend.apirest.entities.RecipientEntity;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
 import com.ontop.challenge.backend.apirest.repositories.IRecipientDao;
 import com.ontop.challenge.backend.apirest.repositories.ITransactionDao;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
@@ -97,10 +97,10 @@ class TransactionServiceImplTest {
         when(restTemplate.getForEntity(anyString(), eq(BalanceResponseDto.class)))
             .thenReturn(new ResponseEntity<>(new BalanceResponseDto(15.0, userId), HttpStatus.OK));
 
-        // Mocking getRecipient
-        Recipient mockRecipient = new Recipient();
+        // Mocking getRecipientEntity
+        RecipientEntity mockRecipientEntity = new RecipientEntity();
         when(recipientDao.findById(recipientId))
-            .thenReturn(of(mockRecipient));
+            .thenReturn(of(mockRecipientEntity));
 
         // Mocking createWalletTransaction
         when(restTemplate.postForEntity(anyString(), any(HttpEntity.class), eq(WalletTransactionResponseDto.class)))

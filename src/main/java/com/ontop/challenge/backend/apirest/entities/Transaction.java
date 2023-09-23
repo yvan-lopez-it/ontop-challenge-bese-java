@@ -1,4 +1,4 @@
-package com.ontop.challenge.backend.apirest.models;
+package com.ontop.challenge.backend.apirest.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
@@ -46,7 +46,7 @@ public class Transaction implements Serializable {
     @Column(nullable = false)
     private Double transactionFee;
 
-    @NotNull(message = "The recipient gets can't be null")
+    @NotNull(message = "The recipientEntity gets can't be null")
     @Column(nullable = false)
     private Double recipientGets;
 
@@ -87,5 +87,5 @@ public class Transaction implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")
     @JsonIgnoreProperties(value = {"transactions", "hibernateLazyInitializer", "handler"}, allowSetters = true)
-    private Recipient recipient;
+    private RecipientEntity recipient;
 }

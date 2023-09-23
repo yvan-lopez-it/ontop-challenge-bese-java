@@ -1,7 +1,7 @@
 package com.ontop.challenge.backend.apirest.repositories;
 
-import com.ontop.challenge.backend.apirest.models.Transaction;
-import com.ontop.challenge.backend.apirest.models.Transaction.Status;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction.Status;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

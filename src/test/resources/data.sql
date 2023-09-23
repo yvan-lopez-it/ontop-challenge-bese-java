@@ -1,5 +1,5 @@
 -- Recipients table
-insert into recipients (first_name, last_name, routing_number, national_id_number, account_number, bank_name)
+insert into recipientEntities (first_name, last_name, routing_number, national_id_number, account_number, bank_name)
 values ('Jemimah', 'MacShane', '326047655', '094375570', '2792399946', 'Ledner and Sons Bank');
 
 

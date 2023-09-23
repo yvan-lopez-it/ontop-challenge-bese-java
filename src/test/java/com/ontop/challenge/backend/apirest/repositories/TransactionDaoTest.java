@@ -4,7 +4,7 @@ package com.ontop.challenge.backend.apirest.repositories;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.ontop.challenge.backend.apirest.models.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;

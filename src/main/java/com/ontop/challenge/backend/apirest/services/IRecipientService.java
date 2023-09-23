@@ -1,15 +1,16 @@
 package com.ontop.challenge.backend.apirest.services;
 
-import com.ontop.challenge.backend.apirest.models.Recipient;
+import com.ontop.challenge.backend.apirest.entities.RecipientEntity;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public interface IRecipientService {
 
-    List<Recipient> findAll();
+    List<RecipientEntity> findAll();
 
-    Recipient findById(Long id);
+    @Nullable RecipientEntity findById(Long id);
 
-    Recipient saveRecipient(Recipient recipient);
+    RecipientEntity saveRecipient(RecipientEntity recipientEntity);
 
-    Recipient getRecipient(Long recipientId);
+    RecipientEntity getRecipient(Long recipientId);
 }

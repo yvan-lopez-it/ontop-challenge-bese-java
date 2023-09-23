@@ -1,12 +1,13 @@
 package com.ontop.challenge.backend.apirest.tasks;
 
 import com.ontop.challenge.backend.apirest.builders.TransactionBuilder;
-import com.ontop.challenge.backend.apirest.models.Transaction;
-import com.ontop.challenge.backend.apirest.models.Transaction.Status;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction.Status;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,7 +69,7 @@ public class RefundScheduledTask {
     }
 
 
-    private Transaction createRefundTransaction(Transaction failedTransaction) {
+    private Transaction createRefundTransaction(@NotNull Transaction failedTransaction) {
 
         return TransactionBuilder.buildTransaction(
             failedTransaction.getUserId(),

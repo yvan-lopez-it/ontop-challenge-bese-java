@@ -5,7 +5,8 @@ import com.ontop.challenge.backend.apirest.dto.payment.request.DestinationDto;
 import com.ontop.challenge.backend.apirest.dto.payment.request.PaymentRequestDto;
 import com.ontop.challenge.backend.apirest.dto.payment.request.SourceDto;
 import com.ontop.challenge.backend.apirest.dto.payment.request.SourceInformationDto;
-import com.ontop.challenge.backend.apirest.models.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
+import org.jetbrains.annotations.NotNull;
 
 public class PaymentRequestDtoBuilder {
 
@@ -17,7 +18,7 @@ public class PaymentRequestDtoBuilder {
     private static final String COMPANY_SOURCE_TYPE = "COMPANY";
 
 
-    public static PaymentRequestDto buildPaymentRequestDto(Transaction transaction) {
+    public static PaymentRequestDto buildPaymentRequestDto(@NotNull Transaction transaction) {
         SourceInformationDto sourceInformationDto = SourceInformationDto.builder()
             .name(SOURCE_INFO_NAME)
             .build();

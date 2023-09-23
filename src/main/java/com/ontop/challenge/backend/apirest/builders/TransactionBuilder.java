@@ -1,8 +1,8 @@
 package com.ontop.challenge.backend.apirest.builders;
 
-import com.ontop.challenge.backend.apirest.models.Recipient;
-import com.ontop.challenge.backend.apirest.models.Transaction;
-import com.ontop.challenge.backend.apirest.models.Transaction.Status;
+import com.ontop.challenge.backend.apirest.entities.RecipientEntity;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction.Status;
 
 public class TransactionBuilder {
 
@@ -11,7 +11,7 @@ public class TransactionBuilder {
         Double amountSent,
         Double transactionFee,
         Double recipientGets,
-        Recipient recipient,
+        RecipientEntity recipientEntity,
         Long associatedTransactionId,
         Double refundedAmount,
         String message,
@@ -22,16 +22,16 @@ public class TransactionBuilder {
             .recipientGets(recipientGets)
             .userId(userId)
             .status(transactionStatus)
-            .recipient(recipient)
+            .recipient(recipientEntity)
             .associatedTransactionId(associatedTransactionId)
             .refundedAmount(refundedAmount)
             .message(message)
             .build();
     }
 
-    public static Transaction buildTransaction(Long userId, Double amountSent, Double transactionFee, Double recipientGets, Recipient recipient,
+    public static Transaction buildTransaction(Long userId, Double amountSent, Double transactionFee, Double recipientGets, RecipientEntity recipientEntity,
         String message, Status transactionStatus) {
         return buildTransaction(
-            userId, amountSent, transactionFee, recipientGets, recipient, null, 0.0, message, transactionStatus);
+            userId, amountSent, transactionFee, recipientGets, recipientEntity, null, 0.0, message, transactionStatus);
     }
 }

@@ -1,17 +1,18 @@
 package com.ontop.challenge.backend.apirest.services.impl;
 
 import com.ontop.challenge.backend.apirest.builders.TransactionBuilder;
+import com.ontop.challenge.backend.apirest.entities.RecipientEntity;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
 import com.ontop.challenge.backend.apirest.exceptions.payment.PaymentRequestException;
-import com.ontop.challenge.backend.apirest.models.Recipient;
-import com.ontop.challenge.backend.apirest.models.Transaction;
-import com.ontop.challenge.backend.apirest.models.Transaction.Status;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction.Status;
 import com.ontop.challenge.backend.apirest.repositories.ITransactionDao;
 import com.ontop.challenge.backend.apirest.services.IPaymentService;
 import com.ontop.challenge.backend.apirest.services.IRecipientService;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,20 +48,20 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     @Override
-    public List<Transaction> saveAllTransactions(List<Transaction> transactions) {
+    public @NotNull List<Transaction> saveAllTransactions(@NotNull List<Transaction> transactions) {
         return transactionDao.saveAll(transactions);
     }
 
     @Override
-    public Transaction performWalletToBankTransaction(Long userId, Long recipientId, Double amountSent) {
+    public @NotNull Transaction performWalletToBankTransaction(Long userId, Long recipientId, Double amountSent) {
 
         // Check user balance
         walletService.checkBalance(userId, amountSent);
 
-        // Retrieve recipient
-        Recipient recipient = recipientService.getRecipient(recipientId);
+        // Retrieve recipientEntity
+        RecipientEntity recipientEntity = recipientService.getRecipient(recipientId);
 
-        // Calculate transaction fee and recipient gets
+        // Calculate transaction fee and recipientEntity gets
         Double transactionFee = this.calculateTransactionFee(amountSent);
         Double recipientGets = this.calculateRecipientGets(amountSent, transactionFee);
 
@@ -69,7 +70,7 @@ public class TransactionServiceImpl implements ITransactionService {
         walletService.updateWallet(userId, recipientGets, true);
 
         // Create and save transaction
-        Transaction savedTransaction = this.createAndSaveTransaction(userId, amountSent, transactionFee, recipientGets, recipient);
+        Transaction savedTransaction = this.createAndSaveTransaction(userId, amountSent, transactionFee, recipientGets, recipientEntity);
 
         // Perform payment
         try {
@@ -94,23 +95,23 @@ public class TransactionServiceImpl implements ITransactionService {
         return transactionDao.findByStatus(status);
     }
 
-    private Double calculateTransactionFee(Double amountSent) {
+    private @NotNull Double calculateTransactionFee(Double amountSent) {
         return amountSent * (feePercentageVal != null ? feePercentageVal : 0.10);
     }
 
-    private Double calculateRecipientGets(Double amountSent, Double transactionFee) {
+    private @NotNull Double calculateRecipientGets(Double amountSent, Double transactionFee) {
         return amountSent - transactionFee;
     }
 
-    private Transaction createAndSaveTransaction(Long userId, Double amountSent, Double transactionFee, Double recipientGets, Recipient recipient) {
+    private @NotNull Transaction createAndSaveTransaction(Long userId, Double amountSent, Double transactionFee, Double recipientGets, RecipientEntity recipientEntity) {
         Status transactionStatus = Status.IN_PROGRESS;
         Transaction transaction =
             TransactionBuilder
-                .buildTransaction(userId, amountSent, transactionFee, recipientGets, recipient, txMsgDefault, transactionStatus);
+                .buildTransaction(userId, amountSent, transactionFee, recipientGets, recipientEntity, txMsgDefault, transactionStatus);
         return transactionDao.save(transaction);
     }
 
-    private void handlePaymentException(Transaction transaction, Exception e) {
+    private void handlePaymentException(@NotNull Transaction transaction, @NotNull Exception e) {
         log.info("Transaction with status FAILED_TO_REFUND");
         transaction.setStatus(Status.FAILED_TO_REFUND);
         transactionDao.save(transaction);

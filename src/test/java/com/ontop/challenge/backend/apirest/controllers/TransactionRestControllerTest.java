@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.ontop.challenge.backend.apirest.dto.TransactionRequestDto;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
-import com.ontop.challenge.backend.apirest.models.Transaction;
+import com.ontop.challenge.backend.apirest.entities.Transaction;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import java.util.Arrays;
 import java.util.List;

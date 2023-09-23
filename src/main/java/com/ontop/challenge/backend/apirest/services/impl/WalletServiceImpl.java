@@ -8,6 +8,7 @@ import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientB
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletRequestException;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
 import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +105,7 @@ public class WalletServiceImpl implements IWalletService {
             .build();
     }
 
-    private void createWalletTransaction(WalletTransactionRequestDto walletTransactionRequestDto) {
+    private void createWalletTransaction(@NotNull WalletTransactionRequestDto walletTransactionRequestDto) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

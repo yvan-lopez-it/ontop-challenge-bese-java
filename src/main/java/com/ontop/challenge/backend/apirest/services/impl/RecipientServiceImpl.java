@@ -1,10 +1,12 @@
 package com.ontop.challenge.backend.apirest.services.impl;
 
+import com.ontop.challenge.backend.apirest.entities.RecipientEntity;
 import com.ontop.challenge.backend.apirest.exceptions.RecipientNotFoundException;
-import com.ontop.challenge.backend.apirest.models.Recipient;
 import com.ontop.challenge.backend.apirest.repositories.IRecipientDao;
 import com.ontop.challenge.backend.apirest.services.IRecipientService;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,31 +23,31 @@ public class RecipientServiceImpl implements IRecipientService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Recipient> findAll() {
-        return (List<Recipient>) recipientDao.findAll();
+    public @NotNull List<RecipientEntity> findAll() {
+        return (List<RecipientEntity>) recipientDao.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Recipient findById(Long id) {
+    public @Nullable RecipientEntity findById(@NotNull Long id) {
         return recipientDao.findById(id).orElse(null);
     }
 
     @Override
-    public Recipient saveRecipient(Recipient recipient) {
-        return recipientDao.save(recipient);
+    public @NotNull RecipientEntity saveRecipient(@NotNull RecipientEntity recipientEntity) {
+        return recipientDao.save(recipientEntity);
     }
 
     @Override
-    public Recipient getRecipient(Long recipientId) {
-        Recipient recipient = recipientDao.findById(recipientId).orElse(null);
-        this.ensureRecipientExists(recipient);
-        return recipient;
+    public @NotNull RecipientEntity getRecipient(@NotNull Long recipientId) {
+        RecipientEntity recipientEntity = recipientDao.findById(recipientId).orElse(null);
+        this.ensureRecipientExists(recipientEntity);
+        return recipientEntity;
     }
 
-    private void ensureRecipientExists(Recipient recipient) {
-        if (recipient == null) {
-            throw new RecipientNotFoundException("Recipient not found.");
+    private void ensureRecipientExists(@NotNull RecipientEntity recipientEntity) {
+        if (recipientEntity == null) {
+            throw new RecipientNotFoundException("RecipientEntity not found.");
         }
     }
 }

@@ -18,10 +18,10 @@ the Ontop Challenge Backend API using IntelliJ IDEA, Maven, Spring Boot, and an 
    - [AWS container services](#aws-container-services)
 6. [Try it with Postman](#6-try-it-with-postman)
    - [Perform transaction](#perform-transaction)
-   - [Get all transactions by recipient (ordered and filtered)](#get-all-transactions-by-recipient-ordered-and-filtered)
-   - [Get all recipients](#get-all-recipients)
-   - [Save recipients](#save-recipients)
-   - [Get recipìent by id](#get-recipient-by-id)
+   - [Get all transactions by recipientEntity (ordered and filtered)](#get-all-transactions-by-recipientEntity-ordered-and-filtered)
+   - [Get all recipientEntities](#get-all-recipientEntities)
+   - [Save recipientEntities](#save-recipientEntities)
+   - [Get recipìent by id](#get-recipientEntity-by-id)
 
 ## Prerequisites
 
@@ -65,7 +65,7 @@ git clone git@github.com:yvan-lopez-it/ontop-challenge-bese-java.git
 * Create a `data.sql` file in the `src/main/resources` directory if it doesn't exist.
 * Populate the `data.sql` file with the SQL statements needed for initializing your database with
   sample data.
-* The file has been preloaded with just 1 `recipient` and 8 `transactions`.
+* The file has been preloaded with just 1 `recipientEntity` and 8 `transactions`.
 * When the app is up and running you can access to http://localhost:8080/h2-console.
 * Then, to login, you can use the credentials described in `application.properties`:
 
@@ -177,18 +177,18 @@ There are 2 main endpoints and 3 helpers:
 ### Perform transaction
 It performs a transaction between the bank accounts and updates the balance.
 
-### Get all transactions by recipient (ordered and filtered)
+### Get all transactions by recipientEntity (ordered and filtered)
 It retrieves the transactions ordered by descending “creation date” (created_at) in a paginated table and
 filtered by amount and date.
 
-### Get all recipients
-Fetches all recipients in db.
+### Get all recipientEntities
+Fetches all recipientEntities in db.
 
-### Save recipients
-Persist a recipient in db.
+### Save recipientEntities
+Persist a recipientEntity in db.
 
-### Get recipient by id
-Find a recipient by its id from db.
+### Get recipientEntity by id
+Find a recipientEntity by its id from db.
 
 ## Let's go!
 

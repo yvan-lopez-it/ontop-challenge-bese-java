@@ -1,8 +1,9 @@
 package com.ontop.challenge.backend.apirest.controllers;
 
-import com.ontop.challenge.backend.apirest.models.Recipient;
+import com.ontop.challenge.backend.apirest.entities.RecipientEntity;
 import com.ontop.challenge.backend.apirest.services.IRecipientService;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,25 +28,25 @@ public class RecipientRestController {
 
 
     @GetMapping
-    public ResponseEntity<List<Recipient>> getAllRecipients() {
-        List<Recipient> recipients = recipientService.findAll();
-        return new ResponseEntity<>(recipients, HttpStatus.OK);
+    public @NotNull ResponseEntity<List<RecipientEntity>> getAllRecipients() {
+        List<RecipientEntity> recipientEntities = recipientService.findAll();
+        return new ResponseEntity<>(recipientEntities, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Recipient> getRecipientById(@PathVariable Long id) {
-        Recipient recipient = recipientService.findById(id);
+    public @NotNull ResponseEntity<RecipientEntity> getRecipientById(@PathVariable Long id) {
+        RecipientEntity recipientEntity = recipientService.findById(id);
 
-        if (recipient != null) {
-            return new ResponseEntity<>(recipient, HttpStatus.OK);
+        if (recipientEntity != null) {
+            return new ResponseEntity<>(recipientEntity, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping
-    public ResponseEntity<Recipient> saveRecipient(@Validated @RequestBody Recipient recipient) {
-        Recipient savedRecipient = recipientService.saveRecipient(recipient);
-        return new ResponseEntity<>(savedRecipient, HttpStatus.CREATED);
+    public @NotNull ResponseEntity<RecipientEntity> saveRecipient(@Validated @RequestBody RecipientEntity recipientEntity) {
+        RecipientEntity savedRecipientEntity = recipientService.saveRecipient(recipientEntity);
+        return new ResponseEntity<>(savedRecipientEntity, HttpStatus.CREATED);
     }
 }
