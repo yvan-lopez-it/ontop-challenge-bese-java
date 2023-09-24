@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 @Entity
 @Table(name = "recipients", schema = "public")
 public class RecipientEntity implements Serializable {
