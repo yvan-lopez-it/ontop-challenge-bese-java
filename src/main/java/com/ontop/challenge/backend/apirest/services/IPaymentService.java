@@ -1,9 +1,9 @@
 package com.ontop.challenge.backend.apirest.services;
 
-import com.ontop.challenge.backend.apirest.entities.Transaction;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 
 public interface IPaymentService {
 
-    void performPayment(Transaction transaction);
+    void performPayment(TransactionEntity transactionEntity);
 
 }

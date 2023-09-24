@@ -1,18 +1,18 @@
 package com.ontop.challenge.backend.apirest.services;
 
-import com.ontop.challenge.backend.apirest.entities.Transaction;
-import com.ontop.challenge.backend.apirest.entities.Transaction.Status;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
+import com.ontop.challenge.backend.apirest.enums.TransactionStatus;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ITransactionService {
 
-    List<Transaction> saveAllTransactions(List<Transaction> transactions);
+    List<TransactionEntity> saveAllTransactions(List<TransactionEntity> transactionEntities);
 
-    Transaction performWalletToBankTransaction(Long userId, Long recipientId, Double amount);
+    TransactionEntity performWalletToBankTransaction(Long userId, Long recipientId, Double amount);
 
-    Page<Transaction> getTransactionsByRecipientId(Long recipientId, Double amountSent, String createdAt, Pageable pageable);
+    Page<TransactionEntity> getTransactionsByRecipientId(Long recipientId, Double amountSent, String createdAt, Pageable pageable);
 
-    List<Transaction> findByStatus(Status status);
+    List<TransactionEntity> findByStatus(TransactionStatus status);
 }

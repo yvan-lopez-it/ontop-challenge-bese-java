@@ -1,11 +1,11 @@
 package com.ontop.challenge.backend.apirest.controllers;
 
 import com.ontop.challenge.backend.apirest.dto.TransactionRequestDto;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
 import com.ontop.challenge.backend.apirest.exceptions.RecipientNotFoundException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.BalanceRequestException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
-import com.ontop.challenge.backend.apirest.entities.Transaction;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -61,8 +61,9 @@ public class TransactionRestController {
         }
 
         try {
-            Transaction transaction = transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(), request.getAmount());
-            return ResponseEntity.ok(transaction);
+            TransactionEntity transactionEntity = transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(),
+                request.getAmount());
+            return ResponseEntity.ok(transactionEntity);
         } catch (RecipientNotFoundException e) {
             response.put("message", "RecipientEntity not found.");
             response.put("error", e.getMessage() + ": " + e.getCause());
@@ -83,7 +84,7 @@ public class TransactionRestController {
         @RequestParam(required = false) String createdAt
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt"));
-        Page<Transaction> transactions = transactionService
+        Page<TransactionEntity> transactions = transactionService
             .getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable);
 
         return ResponseEntity.ok(transactions);

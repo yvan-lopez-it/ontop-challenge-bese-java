@@ -3,8 +3,8 @@ package com.ontop.challenge.backend.apirest.services.impl;
 import com.ontop.challenge.backend.apirest.builders.PaymentRequestDtoBuilder;
 import com.ontop.challenge.backend.apirest.dto.payment.request.PaymentRequestDto;
 import com.ontop.challenge.backend.apirest.dto.payment.response.PaymentResponseDto;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import com.ontop.challenge.backend.apirest.exceptions.payment.PaymentRequestException;
-import com.ontop.challenge.backend.apirest.entities.Transaction;
 import com.ontop.challenge.backend.apirest.services.IPaymentService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -37,12 +37,12 @@ public class PaymentServiceImpl implements IPaymentService {
     }
 
     @Override
-    public void performPayment(@NotNull Transaction transaction) {
-        PaymentRequestDto paymentRequestDto = PaymentRequestDtoBuilder.buildPaymentRequestDto(transaction);
-        this.sendPaymentRequest(paymentRequestDto, transaction);
+    public void performPayment(@NotNull TransactionEntity transactionEntity) {
+        PaymentRequestDto paymentRequestDto = PaymentRequestDtoBuilder.buildPaymentRequestDto(transactionEntity);
+        this.sendPaymentRequest(paymentRequestDto, transactionEntity);
     }
 
-    private void sendPaymentRequest(PaymentRequestDto paymentRequestDto, @NotNull Transaction transaction) {
+    private void sendPaymentRequest(PaymentRequestDto paymentRequestDto, @NotNull TransactionEntity transactionEntity) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -56,14 +56,14 @@ public class PaymentServiceImpl implements IPaymentService {
                 PaymentResponseDto.class
             );
 
-            log.info("Payment request sent successfully for transaction ID: {}", transaction.getId());
+            log.info("Payment request sent successfully for transactionEntity ID: {}", transactionEntity.getId());
             PaymentResponseDto paymentResponseDto = responseEntity.getBody();
 
             if (paymentResponseDto != null) {
                 log.info("Payment response received: {}", paymentResponseDto);
             }
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.error("Error sending payment request for transaction ID: {}. Error message: {}", transaction.getId(), e.getMessage());
+            log.error("Error sending payment request for transactionEntity ID: {}. Error message: {}", transactionEntity.getId(), e.getMessage());
             throw new PaymentRequestException("Error sending payment request", e);
         }
 

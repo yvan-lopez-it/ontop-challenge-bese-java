@@ -5,7 +5,7 @@ import com.ontop.challenge.backend.apirest.dto.payment.request.DestinationDto;
 import com.ontop.challenge.backend.apirest.dto.payment.request.PaymentRequestDto;
 import com.ontop.challenge.backend.apirest.dto.payment.request.SourceDto;
 import com.ontop.challenge.backend.apirest.dto.payment.request.SourceInformationDto;
-import com.ontop.challenge.backend.apirest.entities.Transaction;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import org.jetbrains.annotations.NotNull;
 
 public class PaymentRequestDtoBuilder {
@@ -18,7 +18,7 @@ public class PaymentRequestDtoBuilder {
     private static final String COMPANY_SOURCE_TYPE = "COMPANY";
 
 
-    public static PaymentRequestDto buildPaymentRequestDto(@NotNull Transaction transaction) {
+    public static PaymentRequestDto buildPaymentRequestDto(@NotNull TransactionEntity transactionEntity) {
         SourceInformationDto sourceInformationDto = SourceInformationDto.builder()
             .name(SOURCE_INFO_NAME)
             .build();
@@ -36,16 +36,16 @@ public class PaymentRequestDtoBuilder {
             .build();
 
         AccountDto recipientAccountDto = AccountDto.builder()
-            .accountNumber(transaction.getRecipient().getAccountNumber())
+            .accountNumber(transactionEntity.getRecipient().getAccountNumber())
             .currency(DEFAULT_CURRENCY)
-            .routingNumber(transaction.getRecipient().getRoutingNumber())
+            .routingNumber(transactionEntity.getRecipient().getRoutingNumber())
             .build();
 
         DestinationDto destinationDto = DestinationDto.builder()
-            .name(transaction.getRecipient()
+            .name(transactionEntity.getRecipient()
                 .getFirstName()
                 .concat(" ")
-                .concat(transaction.getRecipient().getLastName())
+                .concat(transactionEntity.getRecipient().getLastName())
             )
             .account(recipientAccountDto)
             .build();
@@ -53,7 +53,7 @@ public class PaymentRequestDtoBuilder {
         return PaymentRequestDto.builder()
             .source(sourceDto)
             .destination(destinationDto)
-            .amount(transaction.getAmountSent())
+            .amount(transactionEntity.getAmountSent())
             .build();
     }
 

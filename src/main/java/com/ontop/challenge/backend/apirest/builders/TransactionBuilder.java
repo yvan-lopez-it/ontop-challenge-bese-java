@@ -1,12 +1,13 @@
 package com.ontop.challenge.backend.apirest.builders;
 
 import com.ontop.challenge.backend.apirest.entities.RecipientEntity;
-import com.ontop.challenge.backend.apirest.entities.Transaction;
-import com.ontop.challenge.backend.apirest.entities.Transaction.Status;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
+import com.ontop.challenge.backend.apirest.enums.TransactionStatus;
+
 
 public class TransactionBuilder {
 
-    public static Transaction buildTransaction(
+    public static TransactionEntity buildTransaction(
         Long userId,
         Double amountSent,
         Double transactionFee,
@@ -15,8 +16,8 @@ public class TransactionBuilder {
         Long associatedTransactionId,
         Double refundedAmount,
         String message,
-        Status transactionStatus) {
-        return Transaction.builder()
+        TransactionStatus transactionStatus) {
+        return TransactionEntity.builder()
             .transactionFee(transactionFee)
             .amountSent(amountSent)
             .recipientGets(recipientGets)
@@ -29,8 +30,8 @@ public class TransactionBuilder {
             .build();
     }
 
-    public static Transaction buildTransaction(Long userId, Double amountSent, Double transactionFee, Double recipientGets, RecipientEntity recipientEntity,
-        String message, Status transactionStatus) {
+    public static TransactionEntity buildTransaction(Long userId, Double amountSent, Double transactionFee, Double recipientGets, RecipientEntity recipientEntity,
+        String message, TransactionStatus transactionStatus) {
         return buildTransaction(
             userId, amountSent, transactionFee, recipientGets, recipientEntity, null, 0.0, message, transactionStatus);
     }

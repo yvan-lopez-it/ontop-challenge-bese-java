@@ -14,7 +14,7 @@ import com.ontop.challenge.backend.apirest.dto.BalanceResponseDto;
 import com.ontop.challenge.backend.apirest.dto.payment.response.PaymentResponseDto;
 import com.ontop.challenge.backend.apirest.dto.wallet.WalletTransactionResponseDto;
 import com.ontop.challenge.backend.apirest.entities.RecipientEntity;
-import com.ontop.challenge.backend.apirest.entities.Transaction;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import com.ontop.challenge.backend.apirest.repositories.IRecipientDao;
 import com.ontop.challenge.backend.apirest.repositories.ITransactionDao;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
@@ -54,10 +54,10 @@ class TransactionServiceImplTest {
     private IRecipientDao recipientDao;
 
     @Mock
-    private Transaction transactionA;
+    private TransactionEntity transactionEntityA;
 
     @Mock
-    private Transaction transactionB;
+    private TransactionEntity transactionEntityB;
 
     @BeforeEach
     public void setUp() {
@@ -72,15 +72,15 @@ class TransactionServiceImplTest {
         String createdAt = "2023-09-04T10:00:00";
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt"));
 
-        List<Transaction> transactions = Arrays.asList(transactionA, transactionB);
-        Page<Transaction> expectedPage = new PageImpl<>(transactions);
+        List<TransactionEntity> transactionEntities = Arrays.asList(transactionEntityA, transactionEntityB);
+        Page<TransactionEntity> expectedPage = new PageImpl<>(transactionEntities);
 
         // Mock the repository method
         when(transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable))
             .thenReturn(expectedPage);
 
         // Call the service method
-        Page<Transaction> result = transactionService.getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable);
+        Page<TransactionEntity> result = transactionService.getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable);
 
         // Assert
         assertThat(result).isEqualTo(expectedPage);
@@ -107,9 +107,9 @@ class TransactionServiceImplTest {
             .thenReturn(new ResponseEntity<>(new WalletTransactionResponseDto(), HttpStatus.OK));
 
         // Mocking transactionDao.save
-        Transaction savedTransaction = new Transaction();
-        when(transactionDao.save(any(Transaction.class)))
-            .thenReturn(savedTransaction);
+        TransactionEntity savedTransactionEntity = new TransactionEntity();
+        when(transactionDao.save(any(TransactionEntity.class)))
+            .thenReturn(savedTransactionEntity);
 
         // Mocking performPayment
         when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(PaymentResponseDto.class)))

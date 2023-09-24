@@ -4,7 +4,7 @@ package com.ontop.challenge.backend.apirest.repositories;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.ontop.challenge.backend.apirest.entities.Transaction;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -26,10 +26,10 @@ public class TransactionDaoTest {
     private ITransactionDao transactionDao;
 
     @Mock
-    private Transaction transactionA;
+    private TransactionEntity transactionEntityA;
 
     @Mock
-    private Transaction transactionB;
+    private TransactionEntity transactionEntityB;
 
     @Test
     public void testFindTransactionsByRecipientIdAndFilters() {
@@ -38,22 +38,22 @@ public class TransactionDaoTest {
         Double amountSent = 1000.0;
         String createdAt = "2023-09-04";
         PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("createdAt")));
-        List<Transaction> transactions = new ArrayList<>();
+        List<TransactionEntity> transactionEntities = new ArrayList<>();
 
-        // Add sample transactions to the list
-        transactions.add(transactionA);
-        transactions.add(transactionB);
+        // Add sample transactionEntities to the list
+        transactionEntities.add(transactionEntityA);
+        transactionEntities.add(transactionEntityB);
 
         // Mock the repository method call
         when(transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable))
-            .thenReturn(new PageImpl<>(transactions));
+            .thenReturn(new PageImpl<>(transactionEntities));
 
         // Call the repository method
-        Page<Transaction> result = transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable);
+        Page<TransactionEntity> result = transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable);
 
         // Assertions
         assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(transactions.size());
+        assertThat(result.getContent()).hasSize(transactionEntities.size());
 
     }
 }

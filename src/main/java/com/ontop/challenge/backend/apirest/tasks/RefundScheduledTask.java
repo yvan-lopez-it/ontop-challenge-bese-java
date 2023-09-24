@@ -1,8 +1,9 @@
 package com.ontop.challenge.backend.apirest.tasks;
 
 import com.ontop.challenge.backend.apirest.builders.TransactionBuilder;
-import com.ontop.challenge.backend.apirest.entities.Transaction;
-import com.ontop.challenge.backend.apirest.entities.Transaction.Status;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
+
+import com.ontop.challenge.backend.apirest.enums.TransactionStatus;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
 import java.util.ArrayList;
@@ -31,56 +32,56 @@ public class RefundScheduledTask {
         this.txMsgRefund = txMsgRefund;
     }
 
-    @Scheduled(fixedDelay = 60 * 1000) // For the sake of the demo challenge, run every 1 minute (adjust as needed)
+    @Scheduled(fixedDelay = 5 * 60 * 1000) // For the sake of the demo challenge, run every 5 minute (adjust as needed)
     public void processFailedWithdrawals() {
-        List<Transaction> failedTransactions = transactionService.findByStatus(Status.FAILED_TO_REFUND);
-        List<Transaction> refundedTransactions = new ArrayList<>(failedTransactions.size());
-        List<Transaction> updatedTransactions = new ArrayList<>(failedTransactions.size());
+        List<TransactionEntity> failedTransactionEntities = transactionService.findByStatus(TransactionStatus.FAILED_TO_REFUND);
+        List<TransactionEntity> refundedTransactionEntities = new ArrayList<>(failedTransactionEntities.size());
+        List<TransactionEntity> updatedTransactionEntities = new ArrayList<>(failedTransactionEntities.size());
 
-        log.warn("[TASK] START - Refund failed transactions.");
+        log.warn("[TASK] START - Refunding 'failed' transactions.");
 
-        if (!failedTransactions.isEmpty()) {
-            log.info("Proceed to refund for {} transactions", failedTransactions.size());
+        if (!failedTransactionEntities.isEmpty()) {
+            log.info("Proceed to refund for {} transactions", failedTransactionEntities.size());
 
-            failedTransactions.forEach(failedTransaction -> {
+            failedTransactionEntities.forEach(failedTransaction -> {
                 // Update user wallet balance
                 walletService.updateWallet(failedTransaction.getUserId(), failedTransaction.getRecipientGets(), false);
 
                 // Create refund transaction and add to list
-                Transaction refundedTransaction = this.createRefundTransaction(failedTransaction);
-                refundedTransactions.add(refundedTransaction);
+                TransactionEntity refundedTransactionEntity = this.createRefundTransaction(failedTransaction);
+                refundedTransactionEntities.add(refundedTransactionEntity);
 
                 // Transactions to be updated
-                failedTransaction.setStatus(Status.FAILED);
-                updatedTransactions.add(failedTransaction);
+                failedTransaction.setStatus(TransactionStatus.FAILED);
+                updatedTransactionEntities.add(failedTransaction);
             });
 
             // Save refunded transactions
-            transactionService.saveAllTransactions(refundedTransactions);
+            transactionService.saveAllTransactions(refundedTransactionEntities);
 
             // Update failed transactions status with FAILED instead of FAILED_TO_REFUND
-            transactionService.saveAllTransactions(updatedTransactions);
+            transactionService.saveAllTransactions(updatedTransactionEntities);
 
         } else {
             log.info("No transactions to refund were found");
         }
 
-        log.info("[TASK] COMPLETED - Refund failed transactions");
+        log.info("[TASK] COMPLETED - Refunding 'failed' transactions");
     }
 
 
-    private Transaction createRefundTransaction(@NotNull Transaction failedTransaction) {
+    private TransactionEntity createRefundTransaction(@NotNull TransactionEntity failedTransactionEntity) {
 
         return TransactionBuilder.buildTransaction(
-            failedTransaction.getUserId(),
+            failedTransactionEntity.getUserId(),
             0.0,
             0.0,
             0.0,
-            failedTransaction.getRecipient(),
-            failedTransaction.getId(),
-            failedTransaction.getAmountSent(),
+            failedTransactionEntity.getRecipient(),
+            failedTransactionEntity.getId(),
+            failedTransactionEntity.getAmountSent(),
             txMsgRefund,
-            Status.REFUNDED
+            TransactionStatus.REFUNDED
         );
     }
 

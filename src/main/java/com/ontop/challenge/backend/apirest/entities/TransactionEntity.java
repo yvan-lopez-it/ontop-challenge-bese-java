@@ -1,6 +1,7 @@
 package com.ontop.challenge.backend.apirest.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.ontop.challenge.backend.apirest.enums.TransactionStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,7 +30,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Transaction implements Serializable {
+public class TransactionEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 4985822431604944901L;
@@ -70,15 +71,10 @@ public class Transaction implements Serializable {
         this.createdAt = dateFormat.format(date);
     }
 
-    // Transaction status
-    public enum Status {
-        IN_PROGRESS, COMPLETED, REFUNDED, FAILED, FAILED_TO_REFUND
-    }
-
     @NotNull(message = "The status can't be null")
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private TransactionStatus status;
 
     @NotNull(message = "The message can't be null")
     @Column(nullable = false)

@@ -6,9 +6,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.ontop.challenge.backend.apirest.dto.TransactionRequestDto;
+import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
-import com.ontop.challenge.backend.apirest.entities.Transaction;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import java.util.Arrays;
 import java.util.List;
@@ -39,10 +39,10 @@ public class TransactionRestControllerTest {
     private ITransactionService transactionService;
 
     @Mock
-    private Transaction transactionA;
+    private TransactionEntity transactionEntityA;
 
     @Mock
-    private Transaction transactionB;
+    private TransactionEntity transactionEntityB;
 
     @Mock
     private TransactionRequestDto transactionRequestDto;
@@ -59,8 +59,8 @@ public class TransactionRestControllerTest {
         Double amountSent = 100.0;
         String createdAt = "2023-09-04T10:00:00";
         Pageable pageable = PageRequest.of(0, 2, Sort.by("createdAt"));
-        List<Transaction> transactions = Arrays.asList(transactionA, transactionB);
-        Page<Transaction> page = new PageImpl<>(transactions);
+        List<TransactionEntity> transactionEntities = Arrays.asList(transactionEntityA, transactionEntityB);
+        Page<TransactionEntity> page = new PageImpl<>(transactionEntities);
 
         // Mock the service method
         when(transactionService.getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable))
@@ -83,7 +83,7 @@ public class TransactionRestControllerTest {
             transactionRequestDto.getUserId(),
             transactionRequestDto.getRecipientId(),
             transactionRequestDto.getAmount())
-        ).thenReturn(transactionA);
+        ).thenReturn(transactionEntityA);
 
         // Prepare a mock BindingResult with validation errors
         BindingResult mockBindingResult = Mockito.mock(BindingResult.class);
@@ -94,7 +94,7 @@ public class TransactionRestControllerTest {
 
         // Assert the response
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof Transaction);
+        assertTrue(response.getBody() instanceof TransactionEntity);
     }
 
     @Test
