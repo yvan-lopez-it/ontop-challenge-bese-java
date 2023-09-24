@@ -70,6 +70,6 @@ public class RecipientEntity implements Serializable {
 
     @OneToMany(mappedBy = "recipient")
     @JsonIgnoreProperties({"recipient", "hibernateLazyInitializer", "handler"})
-    private @NotNull List<TransactionEntity> transactions = new ArrayList<>();
+    private List<TransactionEntity> transactions = new ArrayList<>();
 
 }
