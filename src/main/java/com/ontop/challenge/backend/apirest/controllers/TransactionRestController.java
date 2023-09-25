@@ -1,11 +1,13 @@
 package com.ontop.challenge.backend.apirest.controllers;
 
-import com.ontop.challenge.backend.apirest.dto.TransactionRequestDto;
+import com.ontop.challenge.backend.apirest.dto.transaction.TransactionDto;
+import com.ontop.challenge.backend.apirest.dto.transaction.TransactionRequestDto;
 import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import com.ontop.challenge.backend.apirest.exceptions.BankTransferFailedException;
 import com.ontop.challenge.backend.apirest.exceptions.RecipientNotFoundException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.BalanceRequestException;
 import com.ontop.challenge.backend.apirest.exceptions.wallet.WalletInsufficientBalanceException;
+import com.ontop.challenge.backend.apirest.mapper.TransactionMapper;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -40,9 +42,12 @@ public class TransactionRestController {
 
     private final ITransactionService transactionService;
 
+    private final TransactionMapper transactionMapper;
+
     @Autowired
-    public TransactionRestController(ITransactionService transactionService) {
+    public TransactionRestController(ITransactionService transactionService, TransactionMapper transactionMapper) {
         this.transactionService = transactionService;
+        this.transactionMapper = transactionMapper;
     }
 
     @PostMapping("/perform")
@@ -63,9 +68,10 @@ public class TransactionRestController {
         try {
             TransactionEntity transactionEntity = transactionService.performWalletToBankTransaction(request.getUserId(), request.getRecipientId(),
                 request.getAmount());
-            return ResponseEntity.ok(transactionEntity);
+            TransactionDto transactionDto = transactionMapper.toDto(transactionEntity);
+            return ResponseEntity.ok(transactionDto);
         } catch (RecipientNotFoundException e) {
-            response.put("message", "RecipientEntity not found.");
+            response.put("message", "Recipient not found.");
             response.put("error", e.getMessage() + ": " + e.getCause());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } catch (BankTransferFailedException | WalletInsufficientBalanceException | BalanceRequestException e) {
@@ -84,10 +90,12 @@ public class TransactionRestController {
         @RequestParam(required = false) String createdAt
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt"));
-        Page<TransactionEntity> transactions = transactionService
+        Page<TransactionEntity> transactionEntityPage = transactionService
             .getTransactionsByRecipientId(recipientId, amountSent, createdAt, pageable);
 
-        return ResponseEntity.ok(transactions);
+        Page<TransactionDto> transactionDtoPage = transactionMapper.toPageDto(transactionEntityPage);
+
+        return ResponseEntity.ok(transactionDtoPage);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

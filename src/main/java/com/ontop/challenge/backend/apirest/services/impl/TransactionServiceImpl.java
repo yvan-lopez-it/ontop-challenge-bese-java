@@ -12,6 +12,9 @@ import com.ontop.challenge.backend.apirest.services.IPaymentService;
 import com.ontop.challenge.backend.apirest.services.IRecipientService;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
 import com.ontop.challenge.backend.apirest.services.IWalletService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -71,7 +74,8 @@ public class TransactionServiceImpl implements ITransactionService {
         walletService.updateWallet(userId, recipientGets, true);
 
         // Create and save transaction
-        TransactionEntity savedTransactionEntity = this.createAndSaveTransaction(userId, amountSent, transactionFee, recipientGets, recipientEntity);
+        TransactionEntity savedTransactionEntity =
+            this.createAndSaveTransaction(userId, amountSent, transactionFee, recipientGets, recipientEntity);
 
         // Perform payment
         try {
@@ -87,7 +91,13 @@ public class TransactionServiceImpl implements ITransactionService {
     @Override
     @Transactional(readOnly = true)
     public Page<TransactionEntity> getTransactionsByRecipientId(Long recipientId, Double amountSent, String createdAt, Pageable pageable) {
-        return transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable);
+        LocalDateTime ldtCreated_at = null;
+        if(createdAt != null){
+            LocalDate date = LocalDate.parse(createdAt, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            ldtCreated_at = date.atStartOfDay();
+        }
+
+        return transactionDao.findTransactionsByRecipientId(recipientId, amountSent, ldtCreated_at, pageable);
     }
 
     @Override

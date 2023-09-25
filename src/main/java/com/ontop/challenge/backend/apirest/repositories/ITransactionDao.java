@@ -3,6 +3,7 @@ package com.ontop.challenge.backend.apirest.repositories;
 import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 
 import com.ontop.challenge.backend.apirest.enums.TransactionStatus;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,12 +16,12 @@ public interface ITransactionDao extends JpaRepository<TransactionEntity, Long> 
 
     @Query("SELECT t FROM TransactionEntity t WHERE t.recipient.id = :recipientId " +
         "AND (:amountSent is null OR t.amountSent = :amountSent) " +
-        "AND (SUBSTRING(t.createdAt, 1, 10) = :createdAt OR :createdAt IS NULL) " +
+        "AND (t.createdAt = :createdAt OR :createdAt IS NULL) " +
         "ORDER BY t.createdAt DESC")
-    Page<TransactionEntity> findTransactionsByRecipientIdAndFilters(
+    Page<TransactionEntity> findTransactionsByRecipientId(
         Long recipientId,
         Double amountSent,
-        String createdAt,
+        LocalDateTime createdAt,
         Pageable pageable
     );
 

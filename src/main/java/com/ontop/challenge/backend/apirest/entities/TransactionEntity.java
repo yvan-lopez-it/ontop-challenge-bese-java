@@ -18,18 +18,19 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "transactions", schema = "public")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "transactions", schema = "public")
 public class TransactionEntity implements Serializable {
 
     @Serial
@@ -62,13 +63,11 @@ public class TransactionEntity implements Serializable {
     private Long userId;
 
     @Column(name = "created_at")
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        this.createdAt = dateFormat.format(date);
+        this.createdAt = LocalDateTime.now();
     }
 
     @NotNull(message = "The status can't be null")

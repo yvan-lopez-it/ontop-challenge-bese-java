@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -36,7 +37,9 @@ public class TransactionDaoTest {
 
         Long recipientId = 1L;
         Double amountSent = 1000.0;
-        String createdAt = "2023-09-04";
+        String createdAt = "2023-09-04 00:00:00";
+        LocalDateTime ldtCreated_at = LocalDateTime.parse(createdAt);
+
         PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("createdAt")));
         List<TransactionEntity> transactionEntities = new ArrayList<>();
 
@@ -45,11 +48,11 @@ public class TransactionDaoTest {
         transactionEntities.add(transactionEntityB);
 
         // Mock the repository method call
-        when(transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable))
+        when(transactionDao.findTransactionsByRecipientId(recipientId, amountSent, ldtCreated_at, pageable))
             .thenReturn(new PageImpl<>(transactionEntities));
 
         // Call the repository method
-        Page<TransactionEntity> result = transactionDao.findTransactionsByRecipientIdAndFilters(recipientId, amountSent, createdAt, pageable);
+        Page<TransactionEntity> result = transactionDao.findTransactionsByRecipientId(recipientId, amountSent, ldtCreated_at, pageable);
 
         // Assertions
         assertThat(result).isNotNull();

@@ -13,7 +13,7 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface RecipientMapper {
 
-    RecipientMapper INSTANCE = Mappers.getMapper(RecipientMapper.class);
+//    RecipientMapper INSTANCE = Mappers.getMapper(RecipientMapper.class);
 
     @Mappings({
         @Mapping(source = "id", target = "id"),
