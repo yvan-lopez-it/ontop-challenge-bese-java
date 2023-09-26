@@ -3,19 +3,17 @@ package com.ontop.challenge.backend.apirest.mapper;
 import com.ontop.challenge.backend.apirest.dto.transaction.TransactionDto;
 import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
 import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
-@Mapper(componentModel = ComponentModel.SPRING)
+@Mapper(componentModel = ComponentModel.SPRING, uses = {RecipientMapper.class})
 public interface TransactionMapper {
-
-//    TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
 
     @Mappings({
         @Mapping(source = "id", target = "id"),
@@ -39,7 +37,7 @@ public interface TransactionMapper {
 
     List<TransactionEntity> toListEntity(List<TransactionDto> transactionEntities);
 
-    default Page<TransactionDto> toPageDto(Page<TransactionEntity> transactionEntityPage) {
+    default Page<TransactionDto> toPageDto(@NotNull Page<TransactionEntity> transactionEntityPage) {
         List<TransactionDto> transactionDtos = toListDto(transactionEntityPage.getContent());
         return new PageImpl<>(transactionDtos, transactionEntityPage.getPageable(), transactionEntityPage.getTotalElements());
     }

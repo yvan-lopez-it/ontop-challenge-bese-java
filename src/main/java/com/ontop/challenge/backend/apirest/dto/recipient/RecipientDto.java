@@ -1,5 +1,7 @@
 package com.ontop.challenge.backend.apirest.dto.recipient;
 
+import com.ontop.challenge.backend.apirest.dto.transaction.TransactionDto;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +21,6 @@ public class RecipientDto {
     private String nationalIdNumber;
     private String accountNumber;
     private String bankName;
+    private List<TransactionDto> transactions;
 
 }
