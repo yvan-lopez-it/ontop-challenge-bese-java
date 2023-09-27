@@ -18,7 +18,9 @@ import com.ontop.challenge.backend.apirest.entities.TransactionEntity;
 import com.ontop.challenge.backend.apirest.repositories.IRecipientDao;
 import com.ontop.challenge.backend.apirest.repositories.ITransactionDao;
 import com.ontop.challenge.backend.apirest.services.ITransactionService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,15 +72,15 @@ class TransactionServiceImplTest {
         // Prepare test data
         Long recipientId = 1L;
         Double amountSent = 100.0;
-        String createdAt = "2023-09-04T10:00:00";
-        LocalDateTime ldtCreated_at = LocalDateTime.parse(createdAt);
+        String createdAt = "2023-09-04";
+        LocalDate lcldate = LocalDate.parse(createdAt, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt"));
 
         List<TransactionEntity> transactionEntities = Arrays.asList(transactionEntityA, transactionEntityB);
         Page<TransactionEntity> expectedPage = new PageImpl<>(transactionEntities);
 
         // Mock the repository method
-        when(transactionDao.findTransactionsByRecipientId(recipientId, amountSent, ldtCreated_at, pageable))
+        when(transactionDao.findTransactionsByRecipientId(recipientId, amountSent, lcldate.atStartOfDay(), pageable))
             .thenReturn(expectedPage);
 
         // Call the service method
